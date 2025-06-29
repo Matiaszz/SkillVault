@@ -38,13 +38,10 @@ public class SecurityConfig {
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        //.requestMatchers(HttpMethod.POST)
-                        //.permitAll()
-                        //.requestMatchers(HttpMethod.GET, "/api/user").authenticated()
-                        //.requestMatchers(
-                        //        HttpMethod.GET,
-                        // "/api/company/**")
-                        // .hasRole("COMPANY")
+                        .requestMatchers(HttpMethod.POST, "/api/auth/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/user/**").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/evaluator/**").hasAnyRole("EVALUATOR", "ADMIN")
+                        .requestMatchers("/api/adm/**").hasRole("ADMIN")
                         .anyRequest().authenticated())
                 .build();
     }
