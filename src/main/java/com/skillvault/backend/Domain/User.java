@@ -1,5 +1,6 @@
 package com.skillvault.backend.Domain;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.skillvault.backend.Domain.Enums.UserRole;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -47,6 +48,7 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private UserRole role;
 
+    @JsonBackReference
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Skill> skills = new ArrayList<>();
 
