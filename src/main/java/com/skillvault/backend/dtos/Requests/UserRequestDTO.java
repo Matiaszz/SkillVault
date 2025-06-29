@@ -22,4 +22,5 @@ public record UserRequestDTO(
         String password,
 
         String biography
-) {}
+) {
+}

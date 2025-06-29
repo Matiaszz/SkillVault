@@ -2,6 +2,7 @@ package com.skillvault.backend.Domain;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.skillvault.backend.Domain.Enums.UserRole;
+import com.skillvault.backend.dtos.Requests.UserRequestDTO;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,6 +13,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -76,10 +78,12 @@ public class User implements UserDetails {
         return this.username;
     }
 
-    public User(UUID id, String email){
-        this.id = id;
-        this.email = email;
-        this.role = UserRole.USER;
+    public User(UserRequestDTO dto, UserRole role){
+        this.username = dto.username();
+        this.email = dto.email();
+        this.biography = dto.biography();
+        this.name = dto.name();
+        this.role = role;
     }
 
 }
