@@ -41,7 +41,6 @@ public class SecurityConfig {
                         //.requestMatchers(HttpMethod.POST)
                         //.permitAll()
                         //.requestMatchers(HttpMethod.GET, "/api/user").authenticated()
-                        //.requestMatchers(HttpMethod.GET, "/api/company").authenticated()
                         //.requestMatchers(
                         //        HttpMethod.GET,
                         // "/api/company/**")
