@@ -5,6 +5,7 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.skillvault.backend.Domain.User;
 import com.skillvault.backend.Repositories.UserRepository;
 import com.skillvault.backend.Utils.CookieOptions;
+import com.skillvault.backend.dtos.Responses.UserResponseDTO;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -71,12 +72,12 @@ public class TokenService {
         return generateToken(user.getEmail(), user.getId().toString(), user.getRole().toString());
     }
 
-    public ResponseEntity<?> generateUserTokenAndCreateCookie(User user) {
+    public ResponseEntity<UserResponseDTO> generateUserTokenAndCreateCookie(User user) {
         String token = generateUserToken(user);
         ResponseCookie cookie = createCookie(token, "userToken", cookieOptions);
         log.info("token {} generated.", token);
         return ResponseEntity.ok()
-                .header("Set-Cookie", cookie.toString()).build();
+                .header("Set-Cookie", cookie.toString()).body(new UserResponseDTO(user));
     }
 
     public String validateToken(String token) {
@@ -104,20 +105,13 @@ public class TokenService {
                 .build();
     }
 
-    public boolean hasUserToken(HttpServletRequest request) {
-        return hasToken(request, "userToken");
-    }
 
-    public boolean hasCompanyToken(HttpServletRequest request) {
-        return hasToken(request, "companyToken");
-    }
-
-    private boolean hasToken(HttpServletRequest request, String cookieName) {
+    private boolean hasToken(HttpServletRequest request) {
         if (request.getCookies() == null)
             return false;
 
         for (Cookie cookie : request.getCookies()) {
-            if (cookie.getName().equalsIgnoreCase(cookieName)) {
+            if (cookie.getName().equalsIgnoreCase("userToken")) {
                 return true;
             }
         }
