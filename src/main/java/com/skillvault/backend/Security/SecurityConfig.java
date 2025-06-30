@@ -1,5 +1,6 @@
 package com.skillvault.backend.Security;
 
+import com.skillvault.backend.Services.CustomUserDetailsService;
 import com.skillvault.backend.Services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -29,8 +30,7 @@ public class SecurityConfig {
     private CorsConfigurationSource corsConfigurationSource;
 
     @Autowired
-    @Lazy
-    private UserService userService;
+    private CustomUserDetailsService userService;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {

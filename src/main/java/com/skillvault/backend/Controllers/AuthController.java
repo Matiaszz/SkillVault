@@ -10,7 +10,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -30,15 +32,39 @@ public class AuthController {
 
     @PostMapping("/user/register/")
     public ResponseEntity<UserResponseDTO> userRegister(@RequestBody @Valid UserRequestDTO data, HttpServletRequest request){
-        if (tokenService.hasToken(request)){
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "An user is already authenticated. Please logout first.");
-        }
-
         User user = userService.registerUser(data);
         return tokenService.generateUserTokenAndCreateCookie(user);
     }
 
+    @PostMapping("/user/login/")
+    public ResponseEntity<UserResponseDTO> userLogin(@RequestBody @Valid LoginUserDTO data, HttpServletRequest request){
+        if (tokenService.hasToken(request)){
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "An user is already authenticated. Please logout first.");
+        }
 
+        User loggedUser = userService.loginUser(data);
+        return tokenService.generateUserTokenAndCreateCookie(loggedUser);
+    }
+
+
+
+
+
+
+
+
+
+
+
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout() {
+        ResponseCookie cookie = ResponseCookie.from("userToken", "").httpOnly(true).secure(true)
+                .sameSite("None").path("/").maxAge(0).build();
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                .build();
+    }
 
 
 }
