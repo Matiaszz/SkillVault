@@ -3,11 +3,17 @@ package com.skillvault.backend.Services;
 import com.skillvault.backend.Domain.Enums.UserRole;
 import com.skillvault.backend.Domain.User;
 import com.skillvault.backend.Repositories.UserRepository;
+import com.skillvault.backend.dtos.Requests.LoginUserDTO;
 import com.skillvault.backend.dtos.Requests.UserRequestDTO;
-import jakarta.validation.Valid;
+import com.skillvault.backend.dtos.Responses.UserResponseDTO;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -17,10 +23,11 @@ import org.springframework.web.server.ResponseStatusException;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class UserService implements UserDetailsService {
+public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final AuthenticationManager authenticationManager;
 
     public User registerUser(UserRequestDTO dto){
         if (userRepository.findByEmail(dto.email()).isPresent()) {
@@ -40,8 +47,21 @@ public class UserService implements UserDetailsService {
         return user;
     }
 
-    @Override
-    public User loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userRepository.findByUsername(username).orElseThrow();
+    public User loginUser(LoginUserDTO dto){
+
+        User user = userRepository.findByEmail(dto.email()).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+        var usernamePassword = new UsernamePasswordAuthenticationToken(user.getUsername(), dto.password());
+        Authentication authentication;
+
+        try {
+            authentication = authenticationManager.authenticate(usernamePassword);
+        } catch (AuthenticationException e) {
+            log.error("Login failed for user: {}", dto.email());
+            throw new ResponseStatusException(
+                    HttpStatus.UNAUTHORIZED, "Invalid username or password or company is disabled");
+        }
+
+        return (User) authentication.getPrincipal();
     }
 }
