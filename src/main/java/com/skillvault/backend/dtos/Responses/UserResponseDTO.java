@@ -1,6 +1,5 @@
 package com.skillvault.backend.dtos.Responses;
 
-import com.skillvault.backend.Domain.Skill;
 import com.skillvault.backend.Domain.User;
 
 import java.time.LocalDateTime;
@@ -11,17 +10,11 @@ public record UserResponseDTO(
 
         UUID id,
         String username,
-
         String name,
-
         String email,
-
         String biography,
-
         List<SkillResponseDTO> skills,
-
         LocalDateTime createdAt,
-
         LocalDateTime updatedAt
 ) {
     public UserResponseDTO(User user){
