@@ -106,7 +106,7 @@ public class TokenService {
     }
 
 
-    private boolean hasToken(HttpServletRequest request) {
+    public boolean hasToken(HttpServletRequest request) {
         if (request.getCookies() == null)
             return false;
 
