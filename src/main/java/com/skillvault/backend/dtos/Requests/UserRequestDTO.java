@@ -1,6 +1,7 @@
 package com.skillvault.backend.dtos.Requests;
 
 
+import com.skillvault.backend.Utils.Password;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -19,6 +20,7 @@ public record UserRequestDTO(
 
         @NotBlank(message = "Password is required")
         @Size(min = 6, message = "Password must be 6 characters or more")
+        @Password
         String password,
 
         String biography
