@@ -15,6 +15,7 @@ public record UserRequestDTO(
         @NotBlank(message = "The name is required")
         String name,
 
+        @NotBlank
         @Email(message = "Invalid E-Mail")
         String email,
 
