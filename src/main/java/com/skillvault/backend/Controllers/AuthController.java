@@ -1,5 +1,6 @@
 package com.skillvault.backend.Controllers;
 
+import com.skillvault.backend.Domain.Enums.UserRole;
 import com.skillvault.backend.Domain.User;
 import com.skillvault.backend.Services.TokenService;
 import com.skillvault.backend.Services.UserService;
@@ -10,6 +11,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
@@ -31,9 +33,18 @@ public class AuthController {
     private final TokenService tokenService;
 
     @PostMapping("/user/register/")
-    public ResponseEntity<UserResponseDTO> userRegister(@RequestBody @Valid UserRequestDTO data, HttpServletRequest request){
-        User user = userService.registerUser(data);
-        return tokenService.generateUserTokenAndCreateCookie(user);
+    public ResponseEntity<UserResponseDTO> userRegister(@RequestBody @Valid UserRequestDTO data){
+        return this.register(data, UserRole.USER);
+    }
+
+    @PostMapping("/evaluator/register/")
+    public ResponseEntity<UserResponseDTO> evaluatorRegister(@RequestBody @Valid UserRequestDTO data){
+        return this.register(data, UserRole.EVALUATOR);
+    }
+
+    @PostMapping("/admin/register/")
+    public ResponseEntity<UserResponseDTO> adminRegister(@RequestBody @Valid UserRequestDTO data){
+        return this.register(data, UserRole.ADMIN);
     }
 
     @PostMapping("/user/login/")
@@ -47,23 +58,24 @@ public class AuthController {
     }
 
 
-
-
-
-
-
-
-
-
-
     @PostMapping("/logout")
     public ResponseEntity<Void> logout() {
-        ResponseCookie cookie = ResponseCookie.from("userToken", "").httpOnly(true).secure(true)
-                .sameSite("None").path("/").maxAge(0).build();
-
-        return ResponseEntity.ok()
-                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+        ResponseCookie expiredCookie = ResponseCookie.from("userToken", "")
+                .httpOnly(true)
+                .secure(true)
+                .sameSite("None")
+                .path("/")
+                .maxAge(0)
                 .build();
+
+        return ResponseEntity.noContent()
+                .header(HttpHeaders.SET_COOKIE, expiredCookie.toString())
+                .build();
+    }
+
+    private ResponseEntity<UserResponseDTO> register(UserRequestDTO data, UserRole role){
+        User user = userService.registerUser(data, role);
+        return tokenService.generateUserTokenAndCreateCookie(user);
     }
 
 

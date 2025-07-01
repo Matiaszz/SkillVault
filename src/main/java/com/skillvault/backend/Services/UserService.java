@@ -29,7 +29,7 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
 
-    public User registerUser(UserRequestDTO dto){
+    public User registerUser(UserRequestDTO dto, UserRole role){
         if (userRepository.findByEmail(dto.email()).isPresent()) {
             log.warn("User's email {} already exists", dto.email());
             throw new ResponseStatusException(HttpStatus.CONFLICT, "An user with email: " + dto.email() + " already exists");
@@ -39,7 +39,7 @@ public class UserService {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "An user with username: " + dto.username() + " already exists");
         }
 
-        User user = new User(dto, UserRole.USER);
+        User user = new User(dto, role);
         String encodedPassword = passwordEncoder.encode(dto.password());
         user.setPassword(encodedPassword);
 
