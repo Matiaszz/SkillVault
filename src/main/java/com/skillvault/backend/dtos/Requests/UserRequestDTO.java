@@ -1,7 +1,7 @@
 package com.skillvault.backend.dtos.Requests;
 
 
-import com.skillvault.backend.Utils.Password;
+import com.skillvault.backend.Validations.Password.Password;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
