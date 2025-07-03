@@ -48,6 +48,14 @@ public class User implements UserDetails {
     @Lob
     private String biography;
 
+    private String linkedin;
+
+    private String github;
+
+    private String instagram;
+
+    private String site;
+
     @Column(nullable = false)
     private UserRole role;
 
@@ -82,7 +90,6 @@ public class User implements UserDetails {
     public User(UserRequestDTO dto, UserRole role){
         this.username = dto.username();
         this.email = dto.email();
-        this.biography = dto.biography();
         this.name = dto.name();
         this.role = role;
     }
