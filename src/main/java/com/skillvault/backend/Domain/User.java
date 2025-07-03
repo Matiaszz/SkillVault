@@ -42,7 +42,7 @@ public class User implements UserDetails {
     private String password;
 
     @JsonBackReference
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private UserProfilePicture profilePicture;
 
     @Lob

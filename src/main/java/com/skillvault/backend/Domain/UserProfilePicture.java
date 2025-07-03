@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.util.UUID;
 
@@ -12,6 +13,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
+@ToString(exclude = "user")
 public class UserProfilePicture {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -21,5 +23,5 @@ public class UserProfilePicture {
     @JsonBackReference
     private User user;
 
-    private String blobName;
+    private String blobId;
 }

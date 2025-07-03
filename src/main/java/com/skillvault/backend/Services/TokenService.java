@@ -11,11 +11,13 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Date;
 
@@ -52,7 +54,7 @@ public class TokenService {
         }
     }
 
-    public Object getLoggedEntity() {
+    public User getLoggedEntity() {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         log.info("Getting logged entity...");
 
@@ -65,7 +67,7 @@ public class TokenService {
         }
 
         log.info("User not authenticated.");
-        return null;
+        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not authenticated");
     }
 
     public String generateUserToken(User user) {
