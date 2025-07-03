@@ -11,7 +11,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
@@ -21,6 +20,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.util.List;
+import java.util.Map;
+
+import static com.skillvault.backend.Validations.DTO.DTOValidator.validateLogin;
+import static com.skillvault.backend.Validations.DTO.DTOValidator.validateUserRequest;
+
 
 @Slf4j
 @RestController
@@ -33,22 +39,28 @@ public class AuthController {
     private final TokenService tokenService;
 
     @PostMapping("/user/register")
-    public ResponseEntity<UserResponseDTO> userRegister(@RequestBody @Valid UserRequestDTO data){
+    public ResponseEntity<?> userRegister(@RequestBody @Valid UserRequestDTO data){
         return this.register(data, UserRole.USER, true);
     }
 
     @PostMapping("/evaluator/register")
-    public ResponseEntity<UserResponseDTO> evaluatorRegister(@RequestBody @Valid UserRequestDTO data){
+    public ResponseEntity<?> evaluatorRegister(@RequestBody @Valid UserRequestDTO data){
         return this.register(data, UserRole.EVALUATOR, false);
     }
 
     @PostMapping("/admin/register")
-    public ResponseEntity<UserResponseDTO> adminRegister(@RequestBody @Valid UserRequestDTO data){
+    public ResponseEntity<?> adminRegister(@RequestBody @Valid UserRequestDTO data){
         return this.register(data, UserRole.ADMIN, false);
     }
 
     @PostMapping("/user/login")
-    public ResponseEntity<UserResponseDTO> userLogin(@RequestBody @Valid LoginUserDTO data, HttpServletRequest request){
+    public ResponseEntity<?> userLogin(@RequestBody @Valid LoginUserDTO data, HttpServletRequest request){
+        List<String> errors = validateLogin(data);
+
+        if (!errors.isEmpty()) {
+            return ResponseEntity.badRequest().body(Map.of("errors", errors));
+        }
+
         if (tokenService.hasToken(request)){
             throw new ResponseStatusException(HttpStatus.CONFLICT, "An user is already authenticated. Please logout first.");
         }
@@ -73,7 +85,13 @@ public class AuthController {
                 .build();
     }
 
-    private ResponseEntity<UserResponseDTO> register(UserRequestDTO data, UserRole role, boolean autoLogin){
+    private ResponseEntity<?> register(UserRequestDTO data, UserRole role, boolean autoLogin){
+        List<String> errors = validateUserRequest(data);
+
+        if (!errors.isEmpty()) {
+            return ResponseEntity.badRequest().body(Map.of("errors", errors));
+        }
+
         User user = userService.registerUser(data, role);
         if (autoLogin){
             return tokenService.generateUserTokenAndCreateCookie(user);

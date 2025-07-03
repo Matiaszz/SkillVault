@@ -13,6 +13,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+import java.util.Map;
+
+import static com.skillvault.backend.Validations.DTO.DTOValidator.validateSkillRequest;
+
 @RestController
 @RequestMapping("/api/skill")
 @AllArgsConstructor
@@ -22,7 +27,12 @@ public class SkillController {
     private TokenService tokenService;
 
     @PostMapping
-    public ResponseEntity<SkillResponseDTO> insertSkill(@RequestBody @Valid SkillRequestDTO dto){
+    public ResponseEntity<?> insertSkill(@RequestBody @Valid SkillRequestDTO dto){
+        List<String> errors = validateSkillRequest(dto);
+
+        if (!errors.isEmpty()) {
+            return ResponseEntity.badRequest().body(Map.of("errors", errors));
+        }
         User user = tokenService.getLoggedEntity();
         SkillResponseDTO response = skillService.registerSkill(user, dto);
         return ResponseEntity.ok(response);
