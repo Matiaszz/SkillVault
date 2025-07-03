@@ -41,6 +41,10 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private String password;
 
+    @JsonBackReference
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private UserProfilePicture profilePicture;
+
     @Lob
     private String biography;
 

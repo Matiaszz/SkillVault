@@ -1,5 +1,7 @@
 package com.skillvault.backend.Security;
 
+import com.azure.storage.blob.BlobContainerClient;
+import com.azure.storage.blob.BlobContainerClientBuilder;
 import com.skillvault.backend.Services.CustomUserDetailsService;
 import com.skillvault.backend.Services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,5 +64,10 @@ public class SecurityConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public BlobContainerClient blobContainerClient(){
+        return new BlobContainerClientBuilder().buildClient();
     }
 }
