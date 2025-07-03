@@ -32,22 +32,22 @@ public class AuthController {
 
     private final TokenService tokenService;
 
-    @PostMapping("/user/register/")
+    @PostMapping("/user/register")
     public ResponseEntity<UserResponseDTO> userRegister(@RequestBody @Valid UserRequestDTO data){
-        return this.register(data, UserRole.USER);
+        return this.register(data, UserRole.USER, true);
     }
 
-    @PostMapping("/evaluator/register/")
+    @PostMapping("/evaluator/register")
     public ResponseEntity<UserResponseDTO> evaluatorRegister(@RequestBody @Valid UserRequestDTO data){
-        return this.register(data, UserRole.EVALUATOR);
+        return this.register(data, UserRole.EVALUATOR, false);
     }
 
-    @PostMapping("/admin/register/")
+    @PostMapping("/admin/register")
     public ResponseEntity<UserResponseDTO> adminRegister(@RequestBody @Valid UserRequestDTO data){
-        return this.register(data, UserRole.ADMIN);
+        return this.register(data, UserRole.ADMIN, false);
     }
 
-    @PostMapping("/user/login/")
+    @PostMapping("/user/login")
     public ResponseEntity<UserResponseDTO> userLogin(@RequestBody @Valid LoginUserDTO data, HttpServletRequest request){
         if (tokenService.hasToken(request)){
             throw new ResponseStatusException(HttpStatus.CONFLICT, "An user is already authenticated. Please logout first.");
@@ -73,9 +73,12 @@ public class AuthController {
                 .build();
     }
 
-    private ResponseEntity<UserResponseDTO> register(UserRequestDTO data, UserRole role){
+    private ResponseEntity<UserResponseDTO> register(UserRequestDTO data, UserRole role, boolean autoLogin){
         User user = userService.registerUser(data, role);
-        return tokenService.generateUserTokenAndCreateCookie(user);
+        if (autoLogin){
+            return tokenService.generateUserTokenAndCreateCookie(user);
+        }
+        return ResponseEntity.ok(new UserResponseDTO(user));
     }
 
 
