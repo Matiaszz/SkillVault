@@ -3,7 +3,10 @@ package com.skillvault.backend.Controllers;
 import com.skillvault.backend.Domain.User;
 import com.skillvault.backend.Services.AzureService;
 import com.skillvault.backend.Services.TokenService;
+import com.skillvault.backend.Services.UserService;
+import com.skillvault.backend.dtos.Requests.UpdateUserDTO;
 import com.skillvault.backend.dtos.Responses.UserResponseDTO;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -22,6 +25,7 @@ import static com.skillvault.backend.Utils.ProfilePictureUtils.validateProfileIm
 public class UserController {
     private final AzureService azureService;
     private final TokenService tokenService;
+    private final UserService userService;
 
     @PostMapping("/uploadProfileImg")
     public ResponseEntity<Void> uploadProfileImage(@RequestParam MultipartFile file) {
@@ -35,9 +39,15 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/my")
+    @GetMapping
     public ResponseEntity<UserResponseDTO> getCurrentUser(){
         User user = tokenService.getLoggedEntity();
         return ResponseEntity.ok(new UserResponseDTO(user));
+    }
+
+    @PatchMapping
+    public ResponseEntity<UserResponseDTO> updateUser(@RequestBody @Valid UpdateUserDTO data){
+        User updatedUser = userService.updateUser(data);
+        return ResponseEntity.ok(new UserResponseDTO(updatedUser));
     }
 }
