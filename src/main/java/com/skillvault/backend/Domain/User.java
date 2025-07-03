@@ -1,9 +1,13 @@
 package com.skillvault.backend.Domain;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.skillvault.backend.Domain.Enums.UserRole;
+import com.skillvault.backend.Validations.Password.Password;
 import com.skillvault.backend.dtos.Requests.UserRequestDTO;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -22,7 +26,6 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@EqualsAndHashCode
 public class User implements UserDetails {
 
     @Id
@@ -35,17 +38,21 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false)
+    @NotBlank
+    @Email
+    @Column(nullable = false, unique = true)
     private String email;
 
+
+    @Password
     @Column(nullable = false)
     private String password;
 
-    @JsonBackReference
+    @JsonManagedReference
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private UserProfilePicture profilePicture;
 
-    @Lob
+    @Column(length = 1000)
     private String biography;
 
     private String linkedin;

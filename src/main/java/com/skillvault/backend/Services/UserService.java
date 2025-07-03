@@ -1,12 +1,16 @@
 package com.skillvault.backend.Services;
 
 import com.skillvault.backend.Domain.Enums.UserRole;
+import com.skillvault.backend.Domain.Skill;
 import com.skillvault.backend.Domain.User;
 import com.skillvault.backend.Domain.UserProfilePicture;
+import com.skillvault.backend.Repositories.SkillRepository;
 import com.skillvault.backend.Repositories.UserProfilePictureRepository;
 import com.skillvault.backend.Repositories.UserRepository;
 import com.skillvault.backend.dtos.Requests.LoginUserDTO;
+import com.skillvault.backend.dtos.Requests.SkillRequestDTO;
 import com.skillvault.backend.dtos.Requests.UserRequestDTO;
+import com.skillvault.backend.dtos.Responses.SkillResponseDTO;
 import com.skillvault.backend.dtos.Responses.UserResponseDTO;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,7 +35,6 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
-    private final UserProfilePictureRepository profilePictureRepository;
 
     public User registerUser(UserRequestDTO dto, UserRole role){
         if (userRepository.findByEmail(dto.email()).isPresent()) {
@@ -69,7 +72,4 @@ public class UserService {
         return (User) authentication.getPrincipal();
     }
 
-    public void save(UserProfilePicture picture){
-        profilePictureRepository.save(picture);
-    }
 }

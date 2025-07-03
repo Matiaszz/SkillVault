@@ -40,7 +40,4 @@ public class UserController {
         User user = tokenService.getLoggedEntity();
         return ResponseEntity.ok(new UserResponseDTO(user));
     }
-
-
-
 }
