@@ -85,7 +85,7 @@ public class AzureService {
         return profilePictureRepository.findByUser_Id(user.getId()).orElse(picture);
     }
 
-    private BlobClient getBlobClient(UserProfilePicture document){
-        String uniqueBlobName = document.getBlobId();
+    private BlobClient getBlobClient(UserProfilePicture picture){
+        String uniqueBlobName = picture.getBlobId();
         return containerClient.getBlobClient(uniqueBlobName);
     }}

@@ -1,4 +1,4 @@
-package com.skillvault.backend.Utils;
+package com.skillvault.backend.Validations.Password;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
