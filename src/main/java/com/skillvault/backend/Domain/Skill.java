@@ -1,11 +1,9 @@
 package com.skillvault.backend.Domain;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.skillvault.backend.dtos.Requests.SkillRequestDTO;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -15,8 +13,8 @@ import java.util.UUID;
 @Entity
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 @Builder
-@EqualsAndHashCode
 public class Skill {
 
     @Id
@@ -26,7 +24,7 @@ public class Skill {
     @Column(nullable = false)
     private String name;
 
-    @Lob
+    @Column(length = 1000)
     private String description;
 
     @CreationTimestamp
@@ -39,5 +37,11 @@ public class Skill {
     @JoinColumn(name = "user_id", nullable = false)
     @JsonBackReference
     private User user;
+
+    public Skill(SkillRequestDTO dto, User user){
+        this.name = dto.name();
+        this.description = dto.description();
+        this.user = user;
+    }
 
 }

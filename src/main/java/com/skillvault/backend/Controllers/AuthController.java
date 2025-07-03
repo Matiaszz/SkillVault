@@ -80,6 +80,4 @@ public class AuthController {
         }
         return ResponseEntity.ok(new UserResponseDTO(user));
     }
-
-
 }
