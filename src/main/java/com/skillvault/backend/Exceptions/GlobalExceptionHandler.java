@@ -45,4 +45,14 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
     }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ExceptionModel> handleGenericException(Exception ex){
+        ExceptionModel error = new ExceptionModel(
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                ex.getClass().getSimpleName(),
+                "An Internal server error occurred, contact DEV team to resolve it."
+        );
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+    }
 }
