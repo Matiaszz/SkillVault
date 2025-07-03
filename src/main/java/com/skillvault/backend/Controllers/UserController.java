@@ -3,6 +3,7 @@ package com.skillvault.backend.Controllers;
 import com.skillvault.backend.Domain.User;
 import com.skillvault.backend.Services.AzureService;
 import com.skillvault.backend.Services.TokenService;
+import com.skillvault.backend.dtos.Responses.UserResponseDTO;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -32,6 +33,12 @@ public class UserController {
         User user = tokenService.getLoggedEntity();
         azureService.uploadProfilePicture(user, file);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/my")
+    public ResponseEntity<UserResponseDTO> getCurrentUser(){
+        User user = tokenService.getLoggedEntity();
+        return ResponseEntity.ok(new UserResponseDTO(user));
     }
 
 
