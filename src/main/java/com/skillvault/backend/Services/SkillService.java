@@ -17,6 +17,7 @@ import java.util.UUID;
 public class SkillService {
 
     private final SkillRepository skillRepository;
+    private final TokenService tokenService;
 
     public SkillResponseDTO registerSkill(User user, SkillRequestDTO skillDTO){
         Skill skill = new Skill(skillDTO, user);
@@ -25,10 +26,15 @@ public class SkillService {
     }
 
     public void deleteSkillIfExists(UUID skillId){
-        if (!skillExistsById(skillId)){
+        Skill skill = skillRepository.findById(skillId).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Skill ID can't be found"));
+
+        User user = tokenService.getLoggedEntity();
+
+        if (user.getId() != skill.getUser().getId()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Skill ID can't be found");
         }
-        skillRepository.deleteById(skillId);
+        skillRepository.delete(skill);
 
     }
 
