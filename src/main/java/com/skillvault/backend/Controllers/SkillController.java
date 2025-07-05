@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import static com.skillvault.backend.Validations.DTO.DTOValidator.validateSkillRequest;
 
@@ -43,5 +44,11 @@ public class SkillController {
                 .map(SkillResponseDTO::new)
                 .toList();
         return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/{skillId}")
+    public ResponseEntity<Void> deleteSkill(@PathVariable UUID skillId){
+        skillService.deleteSkillIfExists(skillId);
+        return ResponseEntity.noContent().build();
     }
 }
