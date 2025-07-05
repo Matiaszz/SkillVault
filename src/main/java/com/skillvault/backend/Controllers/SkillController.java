@@ -8,10 +8,7 @@ import com.skillvault.backend.dtos.Responses.SkillResponseDTO;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
@@ -35,6 +32,16 @@ public class SkillController {
         }
         User user = tokenService.getLoggedEntity();
         SkillResponseDTO response = skillService.registerSkill(user, dto);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/my")
+    public ResponseEntity<List<SkillResponseDTO>> getUserSkills(){
+        User user = tokenService.getLoggedEntity();
+        List<SkillResponseDTO> response = user.getSkills()
+                .stream()
+                .map(SkillResponseDTO::new)
+                .toList();
         return ResponseEntity.ok(response);
     }
 }
