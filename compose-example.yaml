@@ -1,16 +1,40 @@
+# NOTE: Before running docker-compose, ensure this file is located in the project root directory (one level above SkillVault/)
+# NOTE: The build context is '.', so the Dockerfile path must be relative to the root directory, e.g., Docker/backend/Dockerfile-example
+# NOTE: Your project structure should resemble:
+#       rootDir/
+#         ├── docker-compose.yml
+#         ├── Docker/backend/Dockerfile-example
+#         └── SkillVault/ (your source code and Maven project files)
+
 services:
-  postgres:
-    image: postgres:15
-    container_name: CONTAINER_NAME
+  mysql:
+    image: mysql:8.0
+    container_name: skillvault_mysql
     restart: always
     ports:
-      - "5432:5432"
+      - "3306:3306"
     environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
+      MYSQL_ROOT_PASSWORD: CHANGE-ME
+      MYSQL_DATABASE: skillvault_db
+      MYSQL_USER: CHANGE-ME
+      MYSQL_PASSWORD: CHANGE-ME
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - mysqldata:/var/lib/mysql
+
+  app:
+    build:
+      context: .
+      dockerfile: Docker/backend/Dockerfile-example
+    depends_on:
+      - mysql
+    working_dir: /app
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/skillvault_db
+      SPRING_DATASOURCE_USERNAME: CHANGE-ME
+      SPRING_DATASOURCE_PASSWORD: CHANGE-ME
+    entrypoint: ["java", "-jar", "app.jar"]
 
 volumes:
-  pgdata:
+  mysqldata:
