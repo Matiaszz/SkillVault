@@ -5,46 +5,44 @@ SkillVault is a technical skills certifications and validations platform built w
 ## Project Structure
 
 ```
-SkillVault/
-├── backend/
-│   ├── Dockerfile-example
-│   ├── README.md
-│   └── wait-connection.sh
+rootDir/
 ├── Docker/
 │   └── backend/
 │       ├── Dockerfile
 │       └── wait-connection.sh
-├── src/
-│   ├── main/
-│   │   ├── java/com/skillvault/backend/
-│   │   │   ├── Controllers/
-│   │   │   ├── Domain/
-│   │   │   ├── Domain/Enums/
-│   │   │   ├── dtos/Requests/
-│   │   │   ├── dtos/Responses/
-│   │   │   ├── Exceptions/
-│   │   │   ├── Repositories/
-│   │   │   ├── Security/
-│   │   │   ├── Services/
-│   │   │   ├── Utils/
-│   │   │   └── Validations/
+├── docker-compose.yaml
+├── SkillVault/
+│   ├── src/
+│   │   ├── main/
+│   │   │   ├── java/com/skillvault/backend/
+│   │   │   │   ├── Controllers/
+│   │   │   │   ├── Domain/
+│   │   │   │   ├── Domain/Enums/
+│   │   │   │   ├── dtos/Requests/
+│   │   │   │   ├── dtos/Responses/
+│   │   │   │   ├── Exceptions/
+│   │   │   │   ├── Repositories/
+│   │   │   │   ├── Security/
+│   │   │   │   ├── Services/
+│   │   │   │   ├── Utils/
+│   │   │   │   └── Validations/
 │   │   └── resources/
 │   │       ├── application.properties
 │   │       └── application.example.properties
-│   └── test/
-│       └── java/com/skillvault/backend/
-├── target/
-│   └── backend-0.0.1-SNAPSHOT.jar
-├── .mvn/
-├── .idea/
-├── .gitignore
-├── .gitattributes
-├── LICENSE
-├── mvnw
-├── mvnw.cmd
-├── pom.xml
-├── README.md
-└── compose-example.yaml
+│   ├── test/
+│   │   └── java/com/skillvault/backend/
+│   ├── target/
+│   │   └── backend-0.0.1-SNAPSHOT.jar
+│   ├── .mvn/
+│   ├── .idea/
+│   ├── .gitignore
+│   ├── .gitattributes
+│   ├── LICENSE
+│   ├── mvnw
+│   ├── mvnw.cmd
+│   ├── pom.xml
+│   ├── README.md
+│   └── compose-example.yaml
 ```
 
 ## Features
