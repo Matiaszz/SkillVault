@@ -1,9 +1,11 @@
 package com.skillvault.backend.Controllers;
 
+import com.skillvault.backend.Domain.Skill;
 import com.skillvault.backend.Domain.User;
 import com.skillvault.backend.Services.SkillService;
 import com.skillvault.backend.Services.TokenService;
 import com.skillvault.backend.dtos.Requests.SkillRequestDTO;
+import com.skillvault.backend.dtos.Requests.UpdateSkillDTO;
 import com.skillvault.backend.dtos.Responses.SkillResponseDTO;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -46,8 +48,14 @@ public class SkillController {
         return ResponseEntity.ok(response);
     }
 
+    @PatchMapping("/{skillId}")
+    public ResponseEntity<SkillResponseDTO> updateSkill(@PathVariable UUID skillId, @RequestBody UpdateSkillDTO data){
+        Skill updatedSkill = skillService.updateSkill(data, skillId);
+        return ResponseEntity.ok(new SkillResponseDTO(updatedSkill));
+    }
+
     @DeleteMapping("/{skillId}")
-    public ResponseEntity<Void> deleteSkill(@PathVariable UUID skillId){
+    public ResponseEntity<Void> deleteSkill(@PathVariable UUID skillId) {
         skillService.deleteSkillIfExists(skillId);
         return ResponseEntity.noContent().build();
     }
