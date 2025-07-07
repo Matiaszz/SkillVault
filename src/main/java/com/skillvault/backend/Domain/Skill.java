@@ -1,6 +1,7 @@
 package com.skillvault.backend.Domain;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.skillvault.backend.Domain.Enums.SkillStatus;
 import com.skillvault.backend.dtos.Requests.SkillRequestDTO;
 import jakarta.persistence.*;
 import lombok.*;
@@ -26,6 +27,8 @@ public class Skill {
 
     @Column(length = 1000)
     private String description;
+
+    private SkillStatus status = SkillStatus.PENDING;
 
     @CreationTimestamp
     private LocalDateTime createdAt;

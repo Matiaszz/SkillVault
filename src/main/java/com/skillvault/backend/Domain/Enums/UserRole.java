@@ -1,20 +1,18 @@
 package com.skillvault.backend.Domain.Enums;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.util.List;
 
 @Getter
+@AllArgsConstructor
 public enum UserRole {
     USER("ROLE_USER"),
     EVALUATOR("ROLE_EVALUATOR"),
     ADMIN("ROLE_ADMIN");
 
     private final String role;
-
-    UserRole(String role){
-        this.role = role;
-    }
 
     public List<String> getPermissions() {
         return switch (this) {

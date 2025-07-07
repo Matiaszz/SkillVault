@@ -6,11 +6,13 @@ import com.skillvault.backend.Repositories.SkillRepository;
 import com.skillvault.backend.dtos.Requests.SkillRequestDTO;
 import com.skillvault.backend.dtos.Requests.UpdateSkillDTO;
 import com.skillvault.backend.dtos.Responses.SkillResponseDTO;
+import jakarta.persistence.EntityManager;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -20,10 +22,20 @@ public class SkillService {
     private final SkillRepository skillRepository;
     private final TokenService tokenService;
 
-    public SkillResponseDTO registerSkill(User user, SkillRequestDTO skillDTO){
+    public Skill registerSkill(User user, SkillRequestDTO skillDTO){
+        String skillName = skillDTO.name();
+
+        boolean exists = user.getSkills().stream()
+                .anyMatch(skill -> skill.getName().equalsIgnoreCase(skillName));
+
+        if (exists) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT, "A skill with the name: '" + skillName + "' already exists");
+        }
+
         Skill skill = new Skill(skillDTO, user);
         Skill savedSkill = skillRepository.save(skill);
-        return new SkillResponseDTO(savedSkill);
+        return savedSkill;
     }
 
     public void deleteSkillIfExists(UUID skillId){

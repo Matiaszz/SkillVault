@@ -34,8 +34,8 @@ public class SkillController {
             return ResponseEntity.badRequest().body(Map.of("errors", errors));
         }
         User user = tokenService.getLoggedEntity();
-        SkillResponseDTO response = skillService.registerSkill(user, dto);
-        return ResponseEntity.ok(response);
+        Skill response = skillService.registerSkill(user, dto);
+        return ResponseEntity.ok(new SkillResponseDTO(response));
     }
 
     @GetMapping("/my")

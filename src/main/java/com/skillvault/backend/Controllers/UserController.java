@@ -16,7 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 
-import static com.skillvault.backend.Utils.ProfilePictureUtils.validateProfileImageExtension;
+import static com.skillvault.backend.Utils.FileUtils.validateProfileImageExtension;
 
 @Slf4j
 @RestController
@@ -28,7 +28,7 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/uploadProfileImg")
-    public ResponseEntity<Void> uploadProfileImage(@RequestParam MultipartFile file) {
+    public ResponseEntity<Void> uploadProfileImage(@RequestParam("file") MultipartFile file) {
 
         if (!validateProfileImageExtension(file)){
             throw new ResponseStatusException(
