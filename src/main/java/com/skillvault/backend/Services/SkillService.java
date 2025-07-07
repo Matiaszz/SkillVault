@@ -4,6 +4,7 @@ import com.skillvault.backend.Domain.Skill;
 import com.skillvault.backend.Domain.User;
 import com.skillvault.backend.Repositories.SkillRepository;
 import com.skillvault.backend.dtos.Requests.SkillRequestDTO;
+import com.skillvault.backend.dtos.Requests.UpdateSkillDTO;
 import com.skillvault.backend.dtos.Responses.SkillResponseDTO;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -38,7 +39,26 @@ public class SkillService {
 
     }
 
-    private boolean skillExistsById(UUID skillId){
-        return skillRepository.existsById(skillId);
+    public Skill updateSkill(UpdateSkillDTO dto, UUID id) {
+        User user = tokenService.getLoggedEntity();
+        if (user == null) throw new ResponseStatusException(
+                HttpStatus.FORBIDDEN, "To access this area, you must be authenticated");
+
+        if (dto == null) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Missing skill data for update");
+
+        Skill skill = skillRepository.findById(id).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Skill not found"));
+
+        if (user.getId() != skill.getUser().getId()){
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You aren't allowed to access this skill");
+        }
+
+
+        if (dto.name() != null && !dto.name().isBlank()) skill.setName(dto.name());
+        if (dto.description() != null && !dto.description().isBlank()) skill.setDescription(dto.description());
+
+
+        return skillRepository.save(skill);
     }
+
 }
