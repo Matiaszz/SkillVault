@@ -1,5 +1,6 @@
 package com.skillvault.backend.Controllers;
 
+import com.skillvault.backend.Domain.Certificate;
 import com.skillvault.backend.Domain.User;
 import com.skillvault.backend.Services.AzureService;
 import com.skillvault.backend.Services.CertificateService;
@@ -8,12 +9,14 @@ import com.skillvault.backend.dtos.Requests.CertificateRequestDTO;
 import com.skillvault.backend.dtos.Responses.CertificateResponseDTO;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Map;
 import java.util.UUID;
 
 import static com.skillvault.backend.Utils.FileUtils.validateCertificateExtension;
@@ -44,6 +47,17 @@ public class CertificateController {
         User user = tokenService.getLoggedEntity();
         CertificateResponseDTO response = certificateService.uploadCertificateWithData(user, file, data);
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/download/{certificateId}")
+    public ResponseEntity<ByteArrayResource> downloadCertificate(@PathVariable UUID certificateId){
+
+        ByteArrayResource resource = certificateService.downloadCertificate(certificateId);
+        Certificate certificate = certificateService.getCertificateById(certificateId);
+
+        return ResponseEntity.ok()
+                .header("Content-Disposition", "attachment; filename=\"" + certificate.getBlobName()  + "\"")
+                .body(resource);
     }
 
 

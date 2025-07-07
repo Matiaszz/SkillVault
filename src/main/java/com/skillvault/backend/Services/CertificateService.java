@@ -9,6 +9,7 @@ import com.skillvault.backend.dtos.Requests.CertificateRequestDTO;
 import com.skillvault.backend.dtos.Responses.CertificateResponseDTO;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -16,6 +17,8 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -57,5 +60,16 @@ public class CertificateService {
         } catch (IOException e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to process file");
         }
+    }
+
+    public ByteArrayResource downloadCertificate(UUID certificateId){
+        Certificate certificate = getCertificateById(certificateId);
+
+       return azureService.downloadCertificate(certificate.getBlobName());
+    }
+
+    public Certificate getCertificateById(UUID id){
+        return certificateRepository.findById(id).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Certificate ID not found"));
     }
 }

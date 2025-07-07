@@ -14,12 +14,14 @@ import com.skillvault.backend.dtos.Responses.CertificateResponseDTO;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.UUID;
 
@@ -29,12 +31,10 @@ public class AzureService {
     private final BlobContainerClient certificateContainerClient;
     private final BlobContainerClient profilePictureContainerClient;
     private final UserRepository userRepository;
-    private final CertificateRepository certificateRepository;
 
     public AzureService(
             UserProfilePictureRepository profilePictureRepository,
             UserRepository userRepository,
-            CertificateRepository certificateRepository,
             @Value("${azure.storage.connection-string}") String connectionString,
             @Value("${azure.storage.certificate.container-name}") String certificateContainer,
             @Value("${azure.storage.profile-picture.container-name}") String profilePictureContainer
@@ -45,7 +45,6 @@ public class AzureService {
                 .connectionString(connectionString).buildClient();
 
         this.userRepository = userRepository;
-        this.certificateRepository = certificateRepository;
 
         this.profilePictureContainerClient = serviceClient.getBlobContainerClient(profilePictureContainer);
         this.certificateContainerClient = serviceClient.getBlobContainerClient(certificateContainer);
@@ -84,6 +83,10 @@ public class AzureService {
         }
     }
 
+    public ByteArrayResource downloadCertificate(String blobName){
+        byte[] data = getCertificateBlobClient(blobName).downloadContent().toBytes();
+        return new ByteArrayResource(data);
+    }
     public void uploadToBlob(String blobName, byte[] data) {
         getCertificateBlobClient(blobName)
                 .upload(new ByteArrayInputStream(data), data.length, true);
