@@ -1,5 +1,6 @@
 package com.skillvault.backend.dtos.Responses;
 
+import com.skillvault.backend.Domain.Enums.SkillStatus;
 import com.skillvault.backend.Domain.Skill;
 
 import java.time.LocalDateTime;
@@ -9,6 +10,7 @@ public record SkillResponseDTO(
         UUID id,
         String name,
         String description,
+        String status,
         LocalDateTime createdAt,
         LocalDateTime updatedAt
 ) {
@@ -17,6 +19,7 @@ public record SkillResponseDTO(
                 skill.getId(),
                 skill.getName(),
                 skill.getDescription(),
+                skill.getStatus().toString(),
                 skill.getCreatedAt(),
                 skill.getUpdatedAt()
         );
