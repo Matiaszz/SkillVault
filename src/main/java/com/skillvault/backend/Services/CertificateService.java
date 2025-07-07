@@ -1,6 +1,7 @@
 package com.skillvault.backend.Services;
 
 import com.skillvault.backend.Domain.Certificate;
+import com.skillvault.backend.Domain.Enums.EvalResult;
 import com.skillvault.backend.Domain.Skill;
 import com.skillvault.backend.Domain.User;
 import com.skillvault.backend.Repositories.CertificateRepository;
@@ -38,6 +39,7 @@ public class CertificateService {
                     .user(user)
                     .name(data.name())
                     .requestedSkills(skills)
+                    .status(EvalResult.PENDING)
                     .build();
 
 
