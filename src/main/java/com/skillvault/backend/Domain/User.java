@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.skillvault.backend.Domain.Enums.UserRole;
 import com.skillvault.backend.Validations.Password.Password;
 import com.skillvault.backend.dtos.Requests.UserRequestDTO;
+import com.skillvault.backend.dtos.Responses.CertificateResponseDTO;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -66,8 +67,12 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private UserRole role;
 
+    @JsonManagedReference
+    @OneToMany(mappedBy = "user", cascade = CascadeType.PERSIST, orphanRemoval = true)
+    private List<Certificate> certificates = new ArrayList<>();
+
     @JsonBackReference
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.PERSIST, orphanRemoval = true)
     private List<Skill> skills = new ArrayList<>();
 
     @CreationTimestamp

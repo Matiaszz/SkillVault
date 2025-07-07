@@ -4,13 +4,14 @@ import com.azure.storage.blob.BlobClient;
 import com.azure.storage.blob.BlobContainerClient;
 import com.azure.storage.blob.BlobServiceClient;
 import com.azure.storage.blob.BlobServiceClientBuilder;
+import com.skillvault.backend.Domain.Certificate;
 import com.skillvault.backend.Domain.User;
 import com.skillvault.backend.Domain.UserProfilePicture;
+import com.skillvault.backend.Repositories.CertificateRepository;
 import com.skillvault.backend.Repositories.UserProfilePictureRepository;
 import com.skillvault.backend.Repositories.UserRepository;
-import jakarta.persistence.EntityManager;
+import com.skillvault.backend.dtos.Responses.CertificateResponseDTO;
 import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -20,35 +21,42 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.UUID;
 
 @Slf4j
 @Service
 public class AzureService {
-    private final BlobContainerClient containerClient;
-
-    private final UserProfilePictureRepository profilePictureRepository;
+    private final BlobContainerClient certificateContainerClient;
+    private final BlobContainerClient profilePictureContainerClient;
     private final UserRepository userRepository;
+    private final CertificateRepository certificateRepository;
 
     public AzureService(
             UserProfilePictureRepository profilePictureRepository,
             UserRepository userRepository,
+            CertificateRepository certificateRepository,
             @Value("${azure.storage.connection-string}") String connectionString,
-            @Value("${azure.storage.container-name}") String containerName){
+            @Value("${azure.storage.certificate.container-name}") String certificateContainer,
+            @Value("${azure.storage.profile-picture.container-name}") String profilePictureContainer
+
+    ) {
 
         BlobServiceClient serviceClient = new BlobServiceClientBuilder()
                 .connectionString(connectionString).buildClient();
 
-        this.profilePictureRepository = profilePictureRepository;
         this.userRepository = userRepository;
+        this.certificateRepository = certificateRepository;
 
-        containerClient = serviceClient.getBlobContainerClient(containerName);
+        this.profilePictureContainerClient = serviceClient.getBlobContainerClient(profilePictureContainer);
+        this.certificateContainerClient = serviceClient.getBlobContainerClient(certificateContainer);
 
-        if (!containerClient.exists()){
-            containerClient.create();
+        if (!profilePictureContainerClient.exists()) {
+            profilePictureContainerClient.create();
         }
 
+        if (!certificateContainerClient.exists()) {
+            certificateContainerClient.create();
+        }
     }
 
     @Transactional
@@ -64,28 +72,29 @@ public class AzureService {
             }
 
             String blobId = profilePicture.getId() + "_" + file.getOriginalFilename();
-            getBlobClient(profilePicture).upload(new ByteArrayInputStream(data), data.length, true);
-            
+            getPictureBlobClient(profilePicture).upload(new ByteArrayInputStream(data), data.length, true);
 
-            profilePicture.setBlobId(blobId);
+
+            profilePicture.setBlobName(blobId);
             user.setProfilePicture(profilePicture);
             userRepository.save(user);
 
         } catch (IOException e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error on file reading.");
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error on picture reading.");
         }
     }
 
-
-    public UserProfilePicture preparePicture(MultipartFile file, User user){
-        UserProfilePicture picture = new UserProfilePicture();
-        picture.setUser(user);
-        picture.setBlobId(UUID.randomUUID() + file.getOriginalFilename());
-
-        return profilePictureRepository.findByUser_Id(user.getId()).orElse(picture);
+    public void uploadToBlob(String blobName, byte[] data) {
+        getCertificateBlobClient(blobName)
+                .upload(new ByteArrayInputStream(data), data.length, true);
     }
 
-    private BlobClient getBlobClient(UserProfilePicture picture){
-        String uniqueBlobName = picture.getBlobId();
-        return containerClient.getBlobClient(uniqueBlobName);
-    }}
+    private BlobClient getCertificateBlobClient(String blobName) {
+        return certificateContainerClient.getBlobClient(blobName);
+    }
+
+    private BlobClient getPictureBlobClient(UserProfilePicture picture) {
+        String uniqueBlobName = picture.getBlobName();
+        return profilePictureContainerClient.getBlobClient(uniqueBlobName);
+    }
+}

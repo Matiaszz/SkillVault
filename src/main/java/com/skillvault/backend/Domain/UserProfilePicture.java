@@ -23,5 +23,6 @@ public class UserProfilePicture {
     @JsonBackReference
     private User user;
 
-    private String blobId;
+    @Column(unique = true)
+    private String blobName;
 }

@@ -1,5 +1,6 @@
 package com.skillvault.backend.dtos.Responses;
 
+import com.skillvault.backend.Domain.Certificate;
 import com.skillvault.backend.Domain.Enums.UserRole;
 import com.skillvault.backend.Domain.User;
 import com.skillvault.backend.Domain.UserProfilePicture;
@@ -17,6 +18,7 @@ public record UserResponseDTO(
         String email,
         String biography,
         List<SkillResponseDTO> skills,
+        List<CertificateResponseDTO> certificates,
         UserProfilePicture profilePicture,
         String linkedin,
         String github,
@@ -34,6 +36,7 @@ public record UserResponseDTO(
                 user.getEmail(),
                 user.getBiography(),
                 user.getSkills().stream().map(SkillResponseDTO::new).toList(),
+                user.getCertificates().stream().map(CertificateResponseDTO::new).toList(),
                 user.getProfilePicture(),
                 user.getLinkedin(),
                 user.getGithub(),

@@ -1,5 +1,6 @@
 package com.skillvault.backend.Validations.DTO;
 
+import com.skillvault.backend.dtos.Requests.CertificateRequestDTO;
 import com.skillvault.backend.dtos.Requests.LoginUserDTO;
 import com.skillvault.backend.dtos.Requests.SkillRequestDTO;
 import com.skillvault.backend.dtos.Requests.UserRequestDTO;
@@ -36,6 +37,14 @@ public class DTOValidator {
         if (dto.password() == null || dto.password().isEmpty()) errors.add("Password is required.");
         if (dto.username() == null || dto.username().isEmpty()) errors.add("Username is required.");
 
+        return errors;
+    }
+
+    public static List<String> validateCertificateRequestDTO(CertificateRequestDTO dto){
+        List<String> errors = new ArrayList<>();
+
+        if (dto.name() == null || dto.name().isEmpty()) errors.add("Name is required.");
+        if (dto.skills() == null || dto.skills().isEmpty()) errors.add("List of skills is required.");
         return errors;
     }
 }
