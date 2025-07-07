@@ -6,6 +6,7 @@ import com.skillvault.backend.Services.CertificateService;
 import com.skillvault.backend.Services.TokenService;
 import com.skillvault.backend.dtos.Requests.CertificateRequestDTO;
 import com.skillvault.backend.dtos.Responses.CertificateResponseDTO;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,7 +17,6 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.UUID;
 
 import static com.skillvault.backend.Utils.FileUtils.validateCertificateExtension;
-import static com.skillvault.backend.Validations.DTO.DTOValidator.validateCertificateRequestDTO;
 
 @RestController
 @RequestMapping("/api/certificate")
@@ -30,7 +30,7 @@ public class CertificateController {
     @PostMapping("/full")
     public ResponseEntity<CertificateResponseDTO> uploadCertificateFull(
             @RequestParam("file") MultipartFile file,
-            @ModelAttribute CertificateRequestDTO data
+            @ModelAttribute @Valid CertificateRequestDTO data
     ) {
         if (file == null || file.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Must have a certificate file");

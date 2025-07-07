@@ -11,20 +11,18 @@ public record CertificateResponseDTO (
         UUID id,
         String name,
         EvalResult status,
-        UserResponseDTO user,
+        UserSimpleDTO user,
         List<SkillResponseDTO> requiredSkills,
         String blobName,
         LocalDateTime createdAt,
         LocalDateTime updatedAt
-
-
 ) {
     public CertificateResponseDTO(Certificate certificate){
         this(
                 certificate.getId(),
                 certificate.getName(),
                 certificate.getStatus(),
-                certificate.getUser() != null ? new UserResponseDTO(certificate.getUser()) : null,
+                new UserSimpleDTO(certificate.getUser()),
                 certificate.getRequestedSkills() != null
                         ? certificate.getRequestedSkills().stream().map(SkillResponseDTO::new).toList()
                         : List.of(),
