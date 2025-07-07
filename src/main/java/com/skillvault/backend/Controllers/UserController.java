@@ -1,10 +1,12 @@
 package com.skillvault.backend.Controllers;
 
+import com.skillvault.backend.Domain.Certificate;
 import com.skillvault.backend.Domain.User;
 import com.skillvault.backend.Services.AzureService;
 import com.skillvault.backend.Services.TokenService;
 import com.skillvault.backend.Services.UserService;
 import com.skillvault.backend.dtos.Requests.UpdateUserDTO;
+import com.skillvault.backend.dtos.Responses.CertificateResponseDTO;
 import com.skillvault.backend.dtos.Responses.UserResponseDTO;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -15,6 +17,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+
+import java.util.List;
 
 import static com.skillvault.backend.Utils.FileUtils.validateProfileImageExtension;
 
@@ -43,6 +47,15 @@ public class UserController {
     public ResponseEntity<UserResponseDTO> getCurrentUser(){
         User user = tokenService.getLoggedEntity();
         return ResponseEntity.ok(new UserResponseDTO(user));
+    }
+
+    @GetMapping("/certificates")
+    public ResponseEntity<List<CertificateResponseDTO>> getUserCertificates(){
+        User user = tokenService.getLoggedEntity();
+        List<CertificateResponseDTO> certificates = user.getCertificates()
+                .stream().map(CertificateResponseDTO::new).toList();
+
+        return ResponseEntity.ok(certificates);
     }
 
     @PatchMapping
