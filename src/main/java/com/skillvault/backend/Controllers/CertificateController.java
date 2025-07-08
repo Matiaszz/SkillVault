@@ -4,6 +4,7 @@ import com.skillvault.backend.Domain.Certificate;
 import com.skillvault.backend.Domain.User;
 import com.skillvault.backend.Services.AzureService;
 import com.skillvault.backend.Services.CertificateService;
+import com.skillvault.backend.Services.EmailService;
 import com.skillvault.backend.Services.TokenService;
 import com.skillvault.backend.dtos.Requests.CertificateRequestDTO;
 import com.skillvault.backend.dtos.Responses.CertificateResponseDTO;
@@ -26,12 +27,13 @@ import static com.skillvault.backend.Utils.FileUtils.validateCertificateExtensio
 @AllArgsConstructor
 public class CertificateController {
 
-    private AzureService azureService;
-    private TokenService tokenService;
-    private CertificateService certificateService;
+    private final TokenService tokenService;
+    private final CertificateService certificateService;
+    private final EmailService emailService;
 
-    @PostMapping("/full")
-    public ResponseEntity<CertificateResponseDTO> uploadCertificateFull(
+
+    @PostMapping
+    public ResponseEntity<CertificateResponseDTO> uploadCertificate(
             @RequestParam("file") MultipartFile file,
             @ModelAttribute @Valid CertificateRequestDTO data
     ) {
@@ -46,6 +48,14 @@ public class CertificateController {
 
         User user = tokenService.getLoggedEntity();
         CertificateResponseDTO response = certificateService.uploadCertificateWithData(user, file, data);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{certificateId}")
+    public ResponseEntity<CertificateResponseDTO> getCertificateById(@PathVariable UUID certificateId){
+        Certificate certificate = certificateService.getCertificateById(certificateId);
+        CertificateResponseDTO response = new CertificateResponseDTO(certificate);
         return ResponseEntity.ok(response);
     }
 
@@ -59,6 +69,8 @@ public class CertificateController {
                 .header("Content-Disposition", "attachment; filename=\"" + certificate.getBlobName()  + "\"")
                 .body(resource);
     }
+
+
 
 
 }

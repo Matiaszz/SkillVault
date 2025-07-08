@@ -46,8 +46,9 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/certificate/download/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/user/**").authenticated()
                         .requestMatchers(HttpMethod.POST, "/api/auth/evaluator/register/" ).hasRole("ADMIN")
-                        // .requestMatchers(HttpMethod.POST, "/api/auth/admin/register").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.POST, "/api/auth/admin/register").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/auth/admin/register").hasRole("ADMIN")
+                        // !!!!!!!!!!!!!!! DO NOT UNCOMMENT THIS IN PRODUCTION !!!!!!!!!!!!!!!!!
+                        // .requestMatchers(HttpMethod.POST, "/api/auth/admin/register").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/evaluator/**").hasAnyRole("EVALUATOR", "ADMIN")
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated())
