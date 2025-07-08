@@ -92,6 +92,10 @@ public class AzureService {
                 .upload(new ByteArrayInputStream(data), data.length, true);
     }
 
+    public void deleteByBlobName(String blobName){
+        getCertificateBlobClient(blobName).deleteIfExists();
+    }
+
     private BlobClient getCertificateBlobClient(String blobName) {
         return certificateContainerClient.getBlobClient(blobName);
     }
