@@ -27,6 +27,7 @@ public class CertificateService {
     private final CertificateRepository certificateRepository;
     private final SkillService skillService;
     private final AzureService azureService;
+    private final EmailService emailService;
 
     @Transactional
     public CertificateResponseDTO uploadCertificateWithData(User user, MultipartFile file, CertificateRequestDTO data) {
@@ -55,6 +56,7 @@ public class CertificateService {
 
             certificateRepository.save(cert);
 
+            emailService.notifyEvaluators(cert);
             return new CertificateResponseDTO(cert);
 
         } catch (IOException e) {
