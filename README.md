@@ -20,6 +20,7 @@ rootDir/
 │   │   │   │   ├── Domain/Enums/
 │   │   │   │   ├── dtos/Requests/
 │   │   │   │   ├── dtos/Responses/
+│   │   │   │   ├── Events/
 │   │   │   │   ├── Exceptions/
 │   │   │   │   ├── Repositories/
 │   │   │   │   ├── Security/
