@@ -2,6 +2,7 @@ package com.skillvault.backend.Services;
 
 import com.skillvault.backend.Domain.Certificate;
 import com.skillvault.backend.Domain.Enums.EvalResult;
+import com.skillvault.backend.Domain.Enums.UserRole;
 import com.skillvault.backend.Domain.Skill;
 import com.skillvault.backend.Domain.User;
 import com.skillvault.backend.Repositories.CertificateRepository;
@@ -17,7 +18,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -28,6 +28,7 @@ public class CertificateService {
     private final SkillService skillService;
     private final AzureService azureService;
     private final EmailService emailService;
+    private final TokenService tokenService;
 
     @Transactional
     public CertificateResponseDTO uploadCertificateWithData(User user, MultipartFile file, CertificateRequestDTO data) {
@@ -73,5 +74,17 @@ public class CertificateService {
     public Certificate getCertificateById(UUID id){
         return certificateRepository.findById(id).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Certificate ID not found"));
+    }
+
+    public void deleteCertificate(UUID id){
+        User user = tokenService.getLoggedEntity();
+        Certificate certificate = getCertificateById(id);
+
+        if (!user.getId().equals(certificate.getUser().getId()) && !user.getRole().equals(UserRole.ADMIN)){
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You can't delete others people certificates");
+        }
+
+        azureService.deleteByBlobName(certificate.getBlobName());
+        certificateRepository.delete(certificate);
     }
 }

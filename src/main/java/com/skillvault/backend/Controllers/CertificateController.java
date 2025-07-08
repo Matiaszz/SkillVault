@@ -70,6 +70,12 @@ public class CertificateController {
                 .body(resource);
     }
 
+    @DeleteMapping("/{certificateId}")
+    public ResponseEntity<Void> deleteCertificate(@PathVariable UUID certificateId){
+        certificateService.deleteCertificate(certificateId);
+        return ResponseEntity.noContent().build();
+    }
+
 
 
 
