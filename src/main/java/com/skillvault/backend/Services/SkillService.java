@@ -34,8 +34,7 @@ public class SkillService {
         }
 
         Skill skill = new Skill(skillDTO, user);
-        Skill savedSkill = skillRepository.save(skill);
-        return savedSkill;
+        return skillRepository.save(skill);
     }
 
     public void deleteSkillIfExists(UUID skillId){
