@@ -2,6 +2,8 @@
 
 SkillVault is a technical skills certifications and validations platform built with Spring Boot, supporting user authentication, skill management, and profile picture storage using Azure Blob Storage.
 
+> **Status:** Project under active development.
+
 ## Project Structure
 
 ```
@@ -43,6 +45,7 @@ rootDir/
 │   ├── mvnw.cmd
 │   ├── pom.xml
 │   ├── README.md
+│   ├── skillvault.http
 │   └── compose-example.yaml
 ```
 
@@ -69,6 +72,14 @@ rootDir/
 - Maven
 - Docker & Docker Compose
 
+### Up docker MySQL service
+1. Copy `compose-example.yaml` to the project root as `docker-compose.yaml`.
+2. Edit environment variables in the compose file and `application.properties` as needed.
+
+```sh
+docker-compose up mysql
+```
+
 ### Build the Project
 
 ```sh
@@ -77,9 +88,7 @@ rootDir/
 
 ### Run with Docker Compose
 
-1. Copy `compose-example.yaml` to the project root as `docker-compose.yaml`.
-2. Edit environment variables in the compose file and `application.properties` as needed.
-3. Build and start the containers:
+Build and start the containers:
 
 ```sh
 docker-compose up --build
@@ -139,14 +148,16 @@ You can also run the backend directly:
 
 ## Docker
 
-- Backend is containerized using `Dockerfile-example`.
-- Waits for MySQL to be available before starting the app using `wait-connection.sh`.
+- Backend is containerized using [`Dockerfile`](../Docker/backend/Dockerfile).
+- Waits for MySQL to be available before starting the app using [`wait-connection.sh`](../Docker/backend/wait-connection.sh).
+- The [`docker-compose.yaml`](../docker-compose.yaml) file orchestrates the backend and MySQL containers.
 
 ## License
 
 This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
 
 ---
+
 ## Testing the API
 
 If you want to test the API quickly, use the following temporary public URL:
