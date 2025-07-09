@@ -9,14 +9,11 @@ import com.skillvault.backend.Domain.Skill;
 import com.skillvault.backend.Domain.User;
 import com.skillvault.backend.Repositories.CertificateRepository;
 import com.skillvault.backend.Repositories.EvaluationRepository;
-import com.skillvault.backend.Repositories.SkillRepository;
 import com.skillvault.backend.Repositories.UserRepository;
 import com.skillvault.backend.dtos.Requests.EvaluationRequestDTO;
 import com.skillvault.backend.dtos.Responses.EvaluationResponseDTO;
-import com.skillvault.backend.dtos.Responses.SkillResponseDTO;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.autoconfigure.graphql.GraphQlProperties;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -97,10 +94,6 @@ public class EvaluationService {
     }
 
     public List<Evaluation> getEvaluationsByUserId(UUID id){
-        User loggedUser = tokenService.getLoggedEntity();
-
-        if (!loggedUser.getRole().equals(UserRole.ADMIN))
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You cannot access this area.");
 
         User targetUser = userRepository.findById(id).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found."));
@@ -113,6 +106,10 @@ public class EvaluationService {
 
         return evaluations;
 
+    }
+
+    public List<Evaluation> getAllEvaluations(){
+        return evaluationRepository.findAll();
     }
 
     public List<Evaluation> getEvaluationsByEvaluatorId(UUID id){

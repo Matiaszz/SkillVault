@@ -1,6 +1,5 @@
 package com.skillvault.backend.Controllers;
 
-import com.skillvault.backend.Domain.Certificate;
 import com.skillvault.backend.Domain.User;
 import com.skillvault.backend.Services.AzureService;
 import com.skillvault.backend.Services.TokenService;
