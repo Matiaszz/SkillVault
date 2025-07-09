@@ -7,6 +7,7 @@ import com.skillvault.backend.dtos.Requests.SkillRequestDTO;
 import com.skillvault.backend.dtos.Requests.UpdateSkillDTO;
 import com.skillvault.backend.dtos.Responses.SkillResponseDTO;
 import jakarta.persistence.EntityManager;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -22,32 +23,38 @@ public class SkillService {
     private final SkillRepository skillRepository;
     private final TokenService tokenService;
 
-    public Skill registerSkill(User user, SkillRequestDTO skillDTO){
+    @Transactional
+    public Skill registerSkill(User user, SkillRequestDTO skillDTO) {
         String skillName = skillDTO.name();
 
-        boolean exists = user.getSkills().stream()
-                .anyMatch(skill -> skill.getName().equalsIgnoreCase(skillName));
-
+        boolean exists = skillRepository.existsByUserAndNameIgnoreCase(user, skillName);
         if (exists) {
             throw new ResponseStatusException(
                     HttpStatus.CONFLICT, "A skill with the name: '" + skillName + "' already exists");
         }
 
         Skill skill = new Skill(skillDTO, user);
-        return skillRepository.save(skill);
+        Skill savedSkill = skillRepository.save(skill);
+        skillRepository.flush();
+
+        return savedSkill;
     }
 
-    public void deleteSkillIfExists(UUID skillId){
+
+    @Transactional
+    public void deleteSkillIfExists(UUID skillId) {
         Skill skill = skillRepository.findById(skillId).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Skill ID can't be found"));
 
         User user = tokenService.getLoggedEntity();
 
-        if (user.getId() != skill.getUser().getId()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Skill ID can't be found");
+        if (!user.getId().equals(skill.getUser().getId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You can't delete others people's skills");
         }
-        skillRepository.delete(skill);
 
+        user.getSkills().remove(skill);
+
+        skillRepository.delete(skill);
     }
 
     public Skill updateSkill(UpdateSkillDTO dto, UUID id) {
@@ -67,9 +74,9 @@ public class SkillService {
 
         if (dto.name() != null && !dto.name().isBlank()) skill.setName(dto.name());
         if (dto.description() != null && !dto.description().isBlank()) skill.setDescription(dto.description());
-
-
-        return skillRepository.save(skill);
+        Skill savedSkill = skillRepository.save(skill);
+        skillRepository.flush();
+        return savedSkill;
     }
 
 }

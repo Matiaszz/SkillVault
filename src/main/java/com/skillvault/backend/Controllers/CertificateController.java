@@ -29,7 +29,6 @@ public class CertificateController {
 
     private final TokenService tokenService;
     private final CertificateService certificateService;
-    private final EmailService emailService;
 
 
     @PostMapping
@@ -43,7 +42,7 @@ public class CertificateController {
 
         if (!validateCertificateExtension(file)) {
             throw new ResponseStatusException(
-                    HttpStatus.FORBIDDEN, "The certificate must be an Image, DOCX or PDF");
+                    HttpStatus.BAD_REQUEST, "The certificate must be an Image, DOCX or PDF");
         }
 
         User user = tokenService.getLoggedEntity();
@@ -70,13 +69,31 @@ public class CertificateController {
                 .body(resource);
     }
 
+
+    @PutMapping("/{certificateId}")
+    public ResponseEntity<CertificateResponseDTO> updateCertificate(
+            @PathVariable UUID certificateId,
+            @ModelAttribute @Valid CertificateRequestDTO data,
+            @RequestParam("file") MultipartFile file){
+
+        if (file == null || file.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Must have a certificate file");
+        }
+
+        if (!validateCertificateExtension(file)) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "The certificate must be an Image, DOCX or PDF");
+        }
+
+        CertificateResponseDTO response = certificateService.updateCertificate(certificateId, file, data);
+        return ResponseEntity.ok(response);
+
+    }
+
     @DeleteMapping("/{certificateId}")
     public ResponseEntity<Void> deleteCertificate(@PathVariable UUID certificateId){
         certificateService.deleteCertificate(certificateId);
         return ResponseEntity.noContent().build();
     }
-
-
-
 
 }
