@@ -19,6 +19,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -90,5 +91,31 @@ public class EvaluationService {
         Evaluation evaluation = evaluationRepository.save(evaluationBuild);
         emailService.notifyAdminsAboutEvaluationCompleted(evaluation);
         return new EvaluationResponseDTO(evaluation);
+    }
+
+    public List<?> getEvaluationsByEvaluatorId(UUID id){
+        List<Evaluation> evaluations = evaluationRepository.findByEvaluator_Id(id).orElse(new ArrayList<>());
+
+        if (evaluations.isEmpty())
+            return evaluations;
+
+        return evaluations.stream().map(EvaluationResponseDTO::new).toList();
+    }
+
+    public Evaluation getEvaluationByCertificateId(UUID id){
+        Evaluation evaluation = evaluationRepository.findByCertificate_Id(id).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Evaluation not found."));
+
+        User loggedUser = tokenService.getLoggedEntity();
+
+        if (!loggedUser.getId().equals(evaluation.getEvaluatedUser().getId())
+                && !loggedUser.getRole().equals(UserRole.EVALUATOR)
+                && !loggedUser.getRole().equals(UserRole.ADMIN)){
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You cannot access other people evaluations.");
+        }
+
+        return evaluation;
+
+
     }
 }
