@@ -28,6 +28,7 @@ public class EvaluationService {
 
     private final CertificateRepository certificateRepository;
     private final CertificateService certificateService;
+    private final EmailService emailService;
     private final EvaluationRepository evaluationRepository;
     private final SkillService skillService;
     private final TokenService tokenService;
@@ -87,6 +88,7 @@ public class EvaluationService {
                 .build();
 
         Evaluation evaluation = evaluationRepository.save(evaluationBuild);
+        emailService.notifyAdminsAboutEvaluationCompleted(evaluation);
         return new EvaluationResponseDTO(evaluation);
     }
 }
