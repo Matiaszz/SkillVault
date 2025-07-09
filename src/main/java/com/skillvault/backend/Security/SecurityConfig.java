@@ -49,7 +49,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/auth/admin/register").hasRole("ADMIN")
                         // !!!!!!!!!!!!!!! DO NOT UNCOMMENT THIS IN PRODUCTION !!!!!!!!!!!!!!!!!
                         // .requestMatchers(HttpMethod.POST, "/api/auth/admin/register").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/evaluator/**").hasAnyRole("EVALUATOR", "ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/evaluation/**").hasAnyRole("EVALUATOR", "ADMIN")
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated())
                 .build();

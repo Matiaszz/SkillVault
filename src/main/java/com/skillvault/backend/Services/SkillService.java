@@ -1,5 +1,6 @@
 package com.skillvault.backend.Services;
 
+import com.skillvault.backend.Domain.Enums.SkillStatus;
 import com.skillvault.backend.Domain.Skill;
 import com.skillvault.backend.Domain.User;
 import com.skillvault.backend.Repositories.SkillRepository;
@@ -77,6 +78,15 @@ public class SkillService {
         Skill savedSkill = skillRepository.save(skill);
         skillRepository.flush();
         return savedSkill;
+    }
+
+    public Skill changeSkillStatus(SkillResponseDTO dto, SkillStatus status){
+        Skill s = skillRepository.findById(dto.id()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Skill not found."));
+        s.setStatus(status);
+        skillRepository.save(s);
+        skillRepository.flush();
+        return s;
+
     }
 
 }
