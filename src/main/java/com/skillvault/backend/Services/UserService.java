@@ -1,32 +1,21 @@
 package com.skillvault.backend.Services;
 
 import com.skillvault.backend.Domain.Enums.UserRole;
-import com.skillvault.backend.Domain.Skill;
 import com.skillvault.backend.Domain.User;
-import com.skillvault.backend.Domain.UserProfilePicture;
-import com.skillvault.backend.Repositories.SkillRepository;
-import com.skillvault.backend.Repositories.UserProfilePictureRepository;
 import com.skillvault.backend.Repositories.UserRepository;
 import com.skillvault.backend.dtos.Requests.LoginUserDTO;
-import com.skillvault.backend.dtos.Requests.SkillRequestDTO;
 import com.skillvault.backend.dtos.Requests.UpdateUserDTO;
 import com.skillvault.backend.dtos.Requests.UserRequestDTO;
-import com.skillvault.backend.dtos.Responses.SkillResponseDTO;
-import com.skillvault.backend.dtos.Responses.UserResponseDTO;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 @Slf4j

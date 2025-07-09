@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.skillvault.backend.Domain.Enums.UserRole;
 import com.skillvault.backend.Validations.Password.Password;
 import com.skillvault.backend.dtos.Requests.UserRequestDTO;
-import com.skillvault.backend.dtos.Responses.CertificateResponseDTO;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

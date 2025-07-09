@@ -2,9 +2,7 @@ package com.skillvault.backend.Controllers;
 
 import com.skillvault.backend.Domain.Certificate;
 import com.skillvault.backend.Domain.User;
-import com.skillvault.backend.Services.AzureService;
 import com.skillvault.backend.Services.CertificateService;
-import com.skillvault.backend.Services.EmailService;
 import com.skillvault.backend.Services.TokenService;
 import com.skillvault.backend.dtos.Requests.CertificateRequestDTO;
 import com.skillvault.backend.dtos.Responses.CertificateResponseDTO;
@@ -17,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.Map;
 import java.util.UUID;
 
 import static com.skillvault.backend.Utils.FileUtils.validateCertificateExtension;

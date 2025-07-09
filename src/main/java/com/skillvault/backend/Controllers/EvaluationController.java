@@ -9,6 +9,7 @@ import com.skillvault.backend.dtos.Requests.EvaluationRequestDTO;
 import com.skillvault.backend.dtos.Responses.EvaluationResponseDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,9 +25,10 @@ public class EvaluationController {
     private final TokenService tokenService;
 
     @GetMapping("/evaluator")
-    public ResponseEntity<List<?>> getEvaluationByLoggedEvaluator(){
+    public ResponseEntity<List<EvaluationResponseDTO>> getEvaluationByLoggedEvaluator(){
         UUID evaluatorId = tokenService.getLoggedEntity().getId();
-        return ResponseEntity.ok(evaluationService.getEvaluationsByEvaluatorId(evaluatorId));
+        List<Evaluation> evaluations = evaluationService.getEvaluationsByEvaluatorId(evaluatorId);
+        return ResponseEntity.ok(evaluations.stream().map(EvaluationResponseDTO::new).toList());
     }
 
     @GetMapping("/by-evaluator/{evaluatorId}")
@@ -41,8 +43,22 @@ public class EvaluationController {
         return ResponseEntity.ok(evaluations.stream().map(EvaluationResponseDTO::new).toList());
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/all")
+    public ResponseEntity<List<EvaluationResponseDTO>> getAllEvaluations(){
+        List<Evaluation> evaluations = evaluationService.getAllEvaluations();
+        if (evaluations == null || evaluations.isEmpty()){
+            return ResponseEntity.noContent().build();
+        }
+
+        List<EvaluationResponseDTO> evaluationResponseDTOS = evaluations.stream()
+                .map(EvaluationResponseDTO::new).toList();
+        return ResponseEntity.ok(evaluationResponseDTOS);
+    }
+
 
     @GetMapping("/my")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> getEvaluationByLoggedUser(){
         User user = tokenService.getLoggedEntity();
         List<Certificate> certificates = user.getCertificates();
@@ -52,8 +68,9 @@ public class EvaluationController {
         }
 
         List<EvaluationResponseDTO> evaluations = certificates.stream()
+                .map(Certificate::getEvaluation)
                 .filter(Objects::nonNull)
-                .map(c -> new EvaluationResponseDTO(c.getEvaluation())).toList();
+                .map(EvaluationResponseDTO::new).toList();
 
 
         if (evaluations.isEmpty()){

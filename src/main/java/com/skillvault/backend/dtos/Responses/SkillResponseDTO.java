@@ -1,6 +1,5 @@
 package com.skillvault.backend.dtos.Responses;
 
-import com.skillvault.backend.Domain.Enums.SkillStatus;
 import com.skillvault.backend.Domain.Skill;
 
 import java.time.LocalDateTime;

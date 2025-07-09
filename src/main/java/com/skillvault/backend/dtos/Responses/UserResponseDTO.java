@@ -1,6 +1,5 @@
 package com.skillvault.backend.dtos.Responses;
 
-import com.skillvault.backend.Domain.Certificate;
 import com.skillvault.backend.Domain.Enums.UserRole;
 import com.skillvault.backend.Domain.User;
 import com.skillvault.backend.Domain.UserProfilePicture;
