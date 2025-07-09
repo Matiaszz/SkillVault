@@ -1,0 +1,173 @@
+@host = {{host}}
+@userToken = {{userToken}}
+
+###
+
+# ----------------------------
+# 🔐 AUTH
+# ----------------------------
+
+### Register regular user
+POST {{host}}/api/auth/user/register
+Content-Type: application/json
+
+{
+  "username": "username",
+  "name": "Name",
+  "email": "name@email.com",
+  "password": "mypass123"
+}
+
+### User login
+POST {{host}}/api/auth/user/login
+Content-Type: application/json
+
+{
+  "email": "name@email.com",
+  "password": "mypass123"
+}
+
+### Logout
+POST {{host}}/api/auth/logout
+Cookie: userToken={{userToken}}
+
+###
+
+# ----------------------------
+# 👤 USER
+# ----------------------------
+
+### Get logged-in user
+GET {{host}}/api/user
+Cookie: userToken={{userToken}}
+
+### Update user profile
+PATCH {{host}}/api/user
+Cookie: userToken={{userToken}}
+Content-Type: application/json
+
+{
+  "name": "name surname",
+  "email": "new@email.com",
+  "biography": "Java Developer",
+  "linkedin": "https://linkedin.com/in/matiassdev",
+  "instagram": "https://instagram.com/xxx",
+  "github": "https://github.com/matiaszz",
+  "site": "https://portfolio.com"
+}
+
+### Upload profile image
+POST {{host}}/api/user/uploadProfileImg
+Cookie: userToken={{userToken}}
+Content-Type: multipart/form-data
+
+--boundary
+Content-Disposition: form-data; name="file"; filename="profile.png"
+Content-Type: image/png
+
+< ./path/to/profile.png
+--boundary--
+
+### Get user certificates
+GET {{host}}/api/user/certificates
+Cookie: userToken={{userToken}}
+
+###
+
+# ----------------------------
+# 🛠️ SKILL
+# ----------------------------
+
+### Create new skill
+POST {{host}}/api/skill
+Cookie: userToken={{userToken}}
+Content-Type: application/json
+
+{
+  "name": "Spring Boot",
+  "description": "Framework for building RESTful APIs with Java"
+}
+
+### Get logged-in user skills
+GET {{host}}/api/skill/my
+Cookie: userToken={{userToken}}
+
+### Update skill
+PATCH {{host}}/api/skill/{{skillId}}
+Cookie: userToken={{userToken}}
+Content-Type: application/json
+
+{
+  "name": "Spring Boot 3",
+  "description": "Updated: compatible with Java 21"
+}
+
+### Delete skill
+DELETE {{host}}/api/skill/{{skillId}}
+Cookie: userToken={{userToken}}
+
+###
+
+# ----------------------------
+# 📄 CERTIFICATE
+# ----------------------------
+
+### Upload certificate
+POST {{host}}/api/certificate
+Cookie: userToken={{userToken}}
+Content-Type: multipart/form-data
+
+--boundary
+Content-Disposition: form-data; name="file"; filename="certificate.pdf"
+Content-Type: application/pdf
+
+< ./path/to/certificate.pdf
+--boundary
+Content-Disposition: form-data; name="name"
+
+Spring Certificate
+--boundary
+Content-Disposition: form-data; name="skills[0].name"
+
+Spring Boot
+--boundary
+Content-Disposition: form-data; name="skills[0].description"
+
+Building REST API with Spring Boot
+--boundary--
+
+### Get certificate by ID
+GET {{host}}/api/certificate/{{certificateId}}
+Cookie: userToken={{userToken}}
+
+### Download certificate
+GET {{host}}/api/certificate/download/{{certificateId}}
+Cookie: userToken={{userToken}}
+
+### Update certificate
+PUT {{host}}/api/certificate/{{certificateId}}
+Cookie: userToken={{userToken}}
+Content-Type: multipart/form-data
+
+--boundary
+Content-Disposition: form-data; name="file"; filename="new_certificate.pdf"
+Content-Type: application/pdf
+
+< ./path/to/new_certificate.pdf
+--boundary
+Content-Disposition: form-data; name="name"
+
+Updated Spring Certificate
+--boundary
+Content-Disposition: form-data; name="skills[0].name"
+
+Spring Security
+--boundary
+Content-Disposition: form-data; name="skills[0].description"
+
+JWT-based security with Spring Boot
+--boundary--
+
+### Delete certificate
+DELETE {{host}}/api/certificate/{{certificateId}}
+Cookie: userToken={{userToken}}
