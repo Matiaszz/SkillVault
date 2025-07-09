@@ -12,6 +12,7 @@ import com.skillvault.backend.Repositories.EvaluationRepository;
 import com.skillvault.backend.Repositories.SkillRepository;
 import com.skillvault.backend.dtos.Requests.EvaluationRequestDTO;
 import com.skillvault.backend.dtos.Responses.EvaluationResponseDTO;
+import com.skillvault.backend.dtos.Responses.SkillResponseDTO;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -46,13 +47,18 @@ public class EvaluationService {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "This certificate already have an evaluation.");
         }
 
+        skillService.verifyLinkBetweenSkillAndCertificate(data.approvedSkills(), certificate);
+        skillService.verifyLinkBetweenSkillAndCertificate(data.reprovedSkills(), certificate);
+
         List<Skill> approvedSkills = data.approvedSkills().stream()
-                .filter(skill -> skill.status().equals("PENDING"))
+                .filter(skill -> SkillStatus.PENDING.name().equalsIgnoreCase(skill.status()))
                 .map(skill -> skillService.changeSkillStatus(skill, SkillStatus.APPROVED)
         ).toList();
 
+
+
         List<Skill> reprovedSkills = data.reprovedSkills().stream()
-                .filter(skill -> skill.status().equals("PENDING"))
+                .filter(skill -> SkillStatus.PENDING.name().equalsIgnoreCase(skill.status()))
                 .map(skill -> skillService.changeSkillStatus(skill, SkillStatus.REPROVED)
                 ).toList();
 

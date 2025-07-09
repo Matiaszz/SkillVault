@@ -61,7 +61,7 @@ public class CertificateService {
 
             certificateRepository.save(cert);
 
-            emailService.notifyEvaluators(cert);
+            emailService.notifyEvaluatorsAboutNewCertificate(cert);
             return new CertificateResponseDTO(cert);
 
         } catch (IOException e) {

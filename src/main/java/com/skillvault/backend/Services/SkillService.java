@@ -1,5 +1,6 @@
 package com.skillvault.backend.Services;
 
+import com.skillvault.backend.Domain.Certificate;
 import com.skillvault.backend.Domain.Enums.SkillStatus;
 import com.skillvault.backend.Domain.Skill;
 import com.skillvault.backend.Domain.User;
@@ -80,13 +81,28 @@ public class SkillService {
         return savedSkill;
     }
 
+    public Skill getSkillById(UUID id){
+        return skillRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Skill not found"));
+    }
+
     public Skill changeSkillStatus(SkillResponseDTO dto, SkillStatus status){
         Skill s = skillRepository.findById(dto.id()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Skill not found."));
         s.setStatus(status);
         skillRepository.save(s);
         skillRepository.flush();
         return s;
+    }
 
+    public void verifyLinkBetweenSkillAndCertificate(List<SkillResponseDTO> skills, Certificate certificate){
+        for (SkillResponseDTO skillDto : skills) {
+            Skill skill = getSkillById(skillDto.id());
+            if (!certificate.getRequestedSkills().contains(skill)) {
+                throw new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST,
+                        "The skill: " + skill.getName() + " is not linked to certificate '" + certificate.getName() + "'."
+                );
+            }
+        }
     }
 
 }
