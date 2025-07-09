@@ -4,13 +4,10 @@ import com.azure.storage.blob.BlobClient;
 import com.azure.storage.blob.BlobContainerClient;
 import com.azure.storage.blob.BlobServiceClient;
 import com.azure.storage.blob.BlobServiceClientBuilder;
-import com.skillvault.backend.Domain.Certificate;
 import com.skillvault.backend.Domain.User;
 import com.skillvault.backend.Domain.UserProfilePicture;
-import com.skillvault.backend.Repositories.CertificateRepository;
 import com.skillvault.backend.Repositories.UserProfilePictureRepository;
 import com.skillvault.backend.Repositories.UserRepository;
-import com.skillvault.backend.dtos.Responses.CertificateResponseDTO;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,7 +18,6 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.UUID;
 
@@ -87,7 +83,7 @@ public class AzureService {
         byte[] data = getCertificateBlobClient(blobName).downloadContent().toBytes();
         return new ByteArrayResource(data);
     }
-    public void uploadToBlob(String blobName, byte[] data) {
+    public void uploadCertificate(String blobName, byte[] data) {
         getCertificateBlobClient(blobName)
                 .upload(new ByteArrayInputStream(data), data.length, true);
     }

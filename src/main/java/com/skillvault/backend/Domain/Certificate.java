@@ -36,7 +36,7 @@ public class Certificate {
     private User user;
 
     @JsonManagedReference
-    @ManyToMany
+    @ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE })
     private List<Skill> requestedSkills = new ArrayList<>();
 
     @Column(unique = true)
