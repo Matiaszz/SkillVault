@@ -8,7 +8,6 @@ import com.skillvault.backend.Services.TokenService;
 import com.skillvault.backend.dtos.Requests.EvaluationRequestDTO;
 import com.skillvault.backend.dtos.Responses.EvaluationResponseDTO;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,10 +29,18 @@ public class EvaluationController {
         return ResponseEntity.ok(evaluationService.getEvaluationsByEvaluatorId(evaluatorId));
     }
 
-    @GetMapping("/evaluator/{evaluatorId}")
-    public ResponseEntity<List<?>> getEvaluationByEvaluatorId(@PathVariable UUID evaluatorId) {
-        return ResponseEntity.ok(evaluationService.getEvaluationsByEvaluatorId(evaluatorId));
+    @GetMapping("/by-evaluator/{evaluatorId}")
+    public ResponseEntity<List<EvaluationResponseDTO>> getEvaluationsByEvaluatorId(@PathVariable UUID evaluatorId) {
+        List<Evaluation> evaluations = evaluationService.getEvaluationsByEvaluatorId(evaluatorId);
+        return ResponseEntity.ok(evaluations.stream().map(EvaluationResponseDTO::new).toList());
     }
+
+    @GetMapping("/by-user/{userId}")
+    public ResponseEntity<List<EvaluationResponseDTO>> getEvaluationsByUserId(@PathVariable UUID userId){
+        List<Evaluation> evaluations = evaluationService.getEvaluationsByUserId(userId);
+        return ResponseEntity.ok(evaluations.stream().map(EvaluationResponseDTO::new).toList());
+    }
+
 
     @GetMapping("/my")
     public ResponseEntity<?> getEvaluationByLoggedUser(){
@@ -57,9 +64,7 @@ public class EvaluationController {
 
     }
 
-
-
-    @GetMapping("/certificate/{certificateId}")
+    @GetMapping("/by-certificate/{certificateId}")
     public ResponseEntity<EvaluationResponseDTO> getEvaluationByCertificateId(@PathVariable UUID certificateId){
         Evaluation dto = evaluationService.getEvaluationByCertificateId(certificateId);
         return ResponseEntity.ok(new EvaluationResponseDTO(dto));

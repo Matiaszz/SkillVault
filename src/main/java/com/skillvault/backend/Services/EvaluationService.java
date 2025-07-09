@@ -10,11 +10,13 @@ import com.skillvault.backend.Domain.User;
 import com.skillvault.backend.Repositories.CertificateRepository;
 import com.skillvault.backend.Repositories.EvaluationRepository;
 import com.skillvault.backend.Repositories.SkillRepository;
+import com.skillvault.backend.Repositories.UserRepository;
 import com.skillvault.backend.dtos.Requests.EvaluationRequestDTO;
 import com.skillvault.backend.dtos.Responses.EvaluationResponseDTO;
 import com.skillvault.backend.dtos.Responses.SkillResponseDTO;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.graphql.GraphQlProperties;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -33,6 +35,7 @@ public class EvaluationService {
     private final EvaluationRepository evaluationRepository;
     private final SkillService skillService;
     private final TokenService tokenService;
+    private final UserRepository userRepository;
 
 
     @Transactional
@@ -93,13 +96,32 @@ public class EvaluationService {
         return new EvaluationResponseDTO(evaluation);
     }
 
-    public List<?> getEvaluationsByEvaluatorId(UUID id){
+    public List<Evaluation> getEvaluationsByUserId(UUID id){
+        User loggedUser = tokenService.getLoggedEntity();
+
+        if (!loggedUser.getRole().equals(UserRole.ADMIN))
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You cannot access this area.");
+
+        User targetUser = userRepository.findById(id).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found."));
+
+        List<Evaluation> evaluations = evaluationRepository.findByEvaluatedUser(targetUser).orElse(new ArrayList<>());
+
+        if (evaluations.isEmpty()){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "This user don't have any evaluation.");
+        }
+
+        return evaluations;
+
+    }
+
+    public List<Evaluation> getEvaluationsByEvaluatorId(UUID id){
         List<Evaluation> evaluations = evaluationRepository.findByEvaluator_Id(id).orElse(new ArrayList<>());
 
         if (evaluations.isEmpty())
-            return evaluations;
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "This evaluator don't have any evaluation.");
 
-        return evaluations.stream().map(EvaluationResponseDTO::new).toList();
+        return evaluations;
     }
 
     public Evaluation getEvaluationByCertificateId(UUID id){
@@ -115,7 +137,5 @@ public class EvaluationService {
         }
 
         return evaluation;
-
-
     }
 }
