@@ -39,6 +39,9 @@ public class Certificate {
     @ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE })
     private List<Skill> requestedSkills = new ArrayList<>();
 
+    @OneToOne(mappedBy = "certificate", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private Evaluation evaluation;
+
     @Column(unique = true)
     private String blobName;
 

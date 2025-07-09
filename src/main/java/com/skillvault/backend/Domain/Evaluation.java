@@ -1,5 +1,6 @@
 package com.skillvault.backend.Domain;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.AssertTrue;
 import lombok.AllArgsConstructor;
@@ -10,6 +11,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -26,20 +28,23 @@ public class Evaluation {
     @Column(nullable = false)
     private String title;
 
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private User evaluator;
 
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private User evaluatedUser;
 
-    @OneToOne(optional = false)
+    @OneToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "certificate_id", unique = true)
     private Certificate certificate;
 
     @ManyToMany
-    private List<Skill> approvedSkills;
+    @JsonBackReference
+    private List<Skill> approvedSkills = new ArrayList<>();
 
     @ManyToMany
-    private List<Skill> reprovedSkills;
+    @JsonBackReference
+    private List<Skill> reprovedSkills = new ArrayList<>();
 
     private String obs;
 

@@ -149,4 +149,14 @@ public class CertificateService {
         return certificateRepository.findById(id).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Certificate ID not found"));
     }
+
+    public EvalResult determineEvalResult(List<Skill> approvedSkills, List<Skill> reprovedSkills) {
+        boolean hasApproved = approvedSkills != null && !approvedSkills.isEmpty();
+        boolean hasReproved = reprovedSkills != null && !reprovedSkills.isEmpty();
+
+        if (hasReproved && !hasApproved) return EvalResult.REJECTED;
+        if (hasReproved) return EvalResult.PARTIALLY_APPROVED;
+        return EvalResult.APPROVED;
+    }
+
 }
