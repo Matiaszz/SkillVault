@@ -7,9 +7,12 @@ import com.skillvault.backend.Services.AzureService;
 import com.skillvault.backend.Services.TokenService;
 import com.skillvault.backend.Services.UserService;
 import com.skillvault.backend.dtos.Requests.UpdateUserDTO;
-import com.skillvault.backend.dtos.Responses.CertificateResponseDTO;
 import com.skillvault.backend.dtos.Responses.SkillResponseDTO;
 import com.skillvault.backend.dtos.Responses.UserResponseDTO;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +21,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
-
 
 import java.util.List;
 
@@ -33,10 +35,17 @@ public class UserController {
     private final TokenService tokenService;
     private final UserService userService;
 
+    @Operation(summary = "Upload profile image for the logged-in user")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Profile image uploaded successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid file type")
+    })
     @PostMapping("/uploadProfileImg")
-    public ResponseEntity<Void> uploadProfileImage(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity<Void> uploadProfileImage(
+            @Parameter(description = "Profile image file (webp, jpg, jpeg, png)")
+            @RequestParam("file") MultipartFile file) {
 
-        if (!validateProfileImageExtension(file)){
+        if (!validateProfileImageExtension(file)) {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST, "\"file\" form-data parameter must be an Image (webp, jpg, jpeg, png)");
         }
@@ -45,20 +54,25 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
+    @Operation(summary = "Get information of the currently authenticated user")
+    @ApiResponse(responseCode = "200", description = "User information retrieved successfully")
     @GetMapping
-    public ResponseEntity<UserResponseDTO> getCurrentUser(){
+    public ResponseEntity<UserResponseDTO> getCurrentUser() {
         User user = tokenService.getLoggedEntity();
         return ResponseEntity.ok(new UserResponseDTO(user));
     }
 
+    @Operation(summary = "Get skills of the currently authenticated user, optionally filtered by status")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Skills retrieved successfully")
+    })
     @GetMapping("/skills")
     public ResponseEntity<List<SkillResponseDTO>> getSkills(
-            @RequestParam(required = false) Boolean validated,
-            @RequestParam(required = false) Boolean pending,
-            @RequestParam(required = false) Boolean reproved
+            @Parameter(description = "Filter by approved skills") @RequestParam(required = false) Boolean validated,
+            @Parameter(description = "Filter by pending skills") @RequestParam(required = false) Boolean pending,
+            @Parameter(description = "Filter by reproved skills") @RequestParam(required = false) Boolean reproved
     ) {
         User user = tokenService.getLoggedEntity();
-
         List<Skill> userSkills = user.getSkills();
 
         if (validated == null && pending == null && reproved == null) {
@@ -82,8 +96,16 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(summary = "Update the currently authenticated user information")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "User updated successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid update data"),
+            @ApiResponse(responseCode = "403", description = "User not authenticated")
+    })
     @PatchMapping
-    public ResponseEntity<UserResponseDTO> updateUser(@RequestBody @Valid UpdateUserDTO data){
+    public ResponseEntity<UserResponseDTO> updateUser(
+            @Parameter(description = "User data to update")
+            @RequestBody @Valid UpdateUserDTO data) {
         User updatedUser = userService.updateUser(data);
         return ResponseEntity.ok(new UserResponseDTO(updatedUser));
     }
