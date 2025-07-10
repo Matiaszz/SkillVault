@@ -33,7 +33,6 @@ public class CertificateService {
     private final AzureService azureService;
     private final EmailService emailService;
     private final TokenService tokenService;
-    private final SkillRepository skillRepository;
     private final UserRepository userRepository;
 
     @Transactional
