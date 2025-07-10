@@ -13,6 +13,8 @@ import com.skillvault.backend.dtos.Responses.CertificateResponseDTO;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.core.io.ByteArrayResource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -148,6 +150,11 @@ public class CertificateService {
     public Certificate getCertificateById(UUID id){
         return certificateRepository.findById(id).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Certificate ID not found"));
+    }
+
+    public Page<Certificate> getCertificatesByUser(UUID userId, Pageable pageable) {
+        return certificateRepository.findByUserId(userId, pageable).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
     }
 
     public EvalResult determineEvalResult(List<Skill> approvedSkills, List<Skill> reprovedSkills) {
