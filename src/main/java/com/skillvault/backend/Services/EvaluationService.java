@@ -14,6 +14,8 @@ import com.skillvault.backend.dtos.Requests.EvaluationRequestDTO;
 import com.skillvault.backend.dtos.Responses.EvaluationResponseDTO;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -93,12 +95,12 @@ public class EvaluationService {
         return new EvaluationResponseDTO(evaluation);
     }
 
-    public List<Evaluation> getEvaluationsByUserId(UUID id){
+    public Page<Evaluation> getEvaluationsByUserId(UUID id, Pageable pageable){
 
         User targetUser = userRepository.findById(id).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found."));
 
-        List<Evaluation> evaluations = evaluationRepository.findByEvaluatedUser(targetUser).orElse(new ArrayList<>());
+        Page<Evaluation> evaluations = evaluationRepository.findByEvaluatedUser(targetUser, pageable);
 
         if (evaluations.isEmpty()){
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "This user don't have any evaluation.");
@@ -108,12 +110,12 @@ public class EvaluationService {
 
     }
 
-    public List<Evaluation> getAllEvaluations(){
-        return evaluationRepository.findAll();
+    public Page<Evaluation> getAllEvaluations(Pageable pageable){
+        return evaluationRepository.findAll(pageable);
     }
 
-    public List<Evaluation> getEvaluationsByEvaluatorId(UUID id){
-        List<Evaluation> evaluations = evaluationRepository.findByEvaluator_Id(id).orElse(new ArrayList<>());
+    public Page<Evaluation> getEvaluationsByEvaluatorId(UUID id, Pageable pageable){
+        Page<Evaluation> evaluations = evaluationRepository.findByEvaluator_Id(id, pageable);
 
         if (evaluations.isEmpty())
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "This evaluator don't have any evaluation.");
