@@ -42,6 +42,11 @@ public class SecurityConfig {
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(
+                                "/swagger-ui.html",
+                                "/swagger-ui/**",
+                                "/v3/api-docs/**"
+                        ).permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/auth/user/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/certificate/download/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/user/**").authenticated()
