@@ -5,15 +5,19 @@ import com.skillvault.backend.Domain.Enums.SkillStatus;
 import com.skillvault.backend.Domain.Skill;
 import com.skillvault.backend.Domain.User;
 import com.skillvault.backend.Repositories.SkillRepository;
+import com.skillvault.backend.Repositories.UserRepository;
 import com.skillvault.backend.dtos.Requests.SkillRequestDTO;
 import com.skillvault.backend.dtos.Requests.UpdateSkillDTO;
 import com.skillvault.backend.dtos.Responses.SkillResponseDTO;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -23,6 +27,7 @@ public class SkillService {
 
     private final SkillRepository skillRepository;
     private final TokenService tokenService;
+    private final UserRepository userRepository;
 
     @Transactional
     public Skill registerSkill(User user, SkillRequestDTO skillDTO) {
@@ -78,6 +83,14 @@ public class SkillService {
         Skill savedSkill = skillRepository.save(skill);
         skillRepository.flush();
         return savedSkill;
+    }
+
+    public Page<Skill> getUserSkills(UUID userId, Pageable pageable){
+        boolean exists = userRepository.existsById(userId);
+        if (!exists){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
+        }
+        return skillRepository.findByUserId(userId, pageable);
     }
 
     public Skill getSkillById(UUID id){

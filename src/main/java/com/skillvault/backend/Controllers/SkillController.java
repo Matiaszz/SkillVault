@@ -9,6 +9,8 @@ import com.skillvault.backend.dtos.Requests.UpdateSkillDTO;
 import com.skillvault.backend.dtos.Responses.SkillResponseDTO;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -39,12 +41,10 @@ public class SkillController {
     }
 
     @GetMapping("/my")
-    public ResponseEntity<List<SkillResponseDTO>> getUserSkills(){
+    public ResponseEntity<Page<SkillResponseDTO>> getUserSkills(Pageable pageable){
         User user = tokenService.getLoggedEntity();
-        List<SkillResponseDTO> response = user.getSkills()
-                .stream()
-                .map(SkillResponseDTO::new)
-                .toList();
+        Page<Skill> skills = skillService.getUserSkills(user.getId(), pageable);
+        Page<SkillResponseDTO> response = skills.map(SkillResponseDTO::new);
         return ResponseEntity.ok(response);
     }
 

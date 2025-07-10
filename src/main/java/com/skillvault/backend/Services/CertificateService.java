@@ -153,8 +153,13 @@ public class CertificateService {
     }
 
     public Page<Certificate> getCertificatesByUser(UUID userId, Pageable pageable) {
-        return certificateRepository.findByUserId(userId, pageable).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+        boolean exists = userRepository.existsById(userId);
+
+        if (!exists) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
+        }
+
+        return certificateRepository.findByUserId(userId, pageable);
     }
 
     public EvalResult determineEvalResult(List<Skill> approvedSkills, List<Skill> reprovedSkills) {

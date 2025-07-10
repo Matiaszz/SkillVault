@@ -9,5 +9,5 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface CertificateRepository extends JpaRepository<Certificate, UUID> {
-    Optional<Page<Certificate>> findByUserId(UUID userId, Pageable pageable);
+    Page<Certificate> findByUserId(UUID userId, Pageable pageable);
 }
