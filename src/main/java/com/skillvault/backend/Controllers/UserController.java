@@ -1,11 +1,14 @@
 package com.skillvault.backend.Controllers;
 
+import com.skillvault.backend.Domain.Enums.SkillStatus;
+import com.skillvault.backend.Domain.Skill;
 import com.skillvault.backend.Domain.User;
 import com.skillvault.backend.Services.AzureService;
 import com.skillvault.backend.Services.TokenService;
 import com.skillvault.backend.Services.UserService;
 import com.skillvault.backend.dtos.Requests.UpdateUserDTO;
 import com.skillvault.backend.dtos.Responses.CertificateResponseDTO;
+import com.skillvault.backend.dtos.Responses.SkillResponseDTO;
 import com.skillvault.backend.dtos.Responses.UserResponseDTO;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -46,6 +49,25 @@ public class UserController {
     public ResponseEntity<UserResponseDTO> getCurrentUser(){
         User user = tokenService.getLoggedEntity();
         return ResponseEntity.ok(new UserResponseDTO(user));
+    }
+
+    @GetMapping("/skills")
+    public ResponseEntity<List<SkillResponseDTO>> getValidatedSkills(@RequestParam(required = false) Boolean validated){
+        User user = tokenService.getLoggedEntity();
+
+        List<Skill> skills = user.getSkills();
+
+        if (validated != null && validated) {
+            skills = skills.stream()
+                    .filter(skill -> skill.getStatus().equals(SkillStatus.APPROVED))
+                    .toList();
+        }
+
+        List<SkillResponseDTO> response = skills.stream()
+                .map(SkillResponseDTO::new)
+                .toList();
+
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/certificates")
