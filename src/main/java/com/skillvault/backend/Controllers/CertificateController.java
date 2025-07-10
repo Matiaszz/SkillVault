@@ -9,6 +9,8 @@ import com.skillvault.backend.dtos.Responses.CertificateResponseDTO;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.core.io.ByteArrayResource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,6 +28,16 @@ public class CertificateController {
 
     private final TokenService tokenService;
     private final CertificateService certificateService;
+
+    @GetMapping("/my")
+    public ResponseEntity<Page<CertificateResponseDTO>> getUserCertificates(Pageable pageable) {
+        UUID userId = tokenService.getLoggedEntity().getId();
+        Page<Certificate> certificatesPage = certificateService.getCertificatesByUser(userId, pageable);
+
+        Page<CertificateResponseDTO> dtoPage = certificatesPage.map(CertificateResponseDTO::new);
+
+        return ResponseEntity.ok(dtoPage);
+    }
 
 
     @PostMapping

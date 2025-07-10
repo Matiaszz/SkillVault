@@ -82,15 +82,6 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/certificates")
-    public ResponseEntity<List<CertificateResponseDTO>> getUserCertificates(){
-        User user = tokenService.getLoggedEntity();
-        List<CertificateResponseDTO> certificates = user.getCertificates()
-                .stream().map(CertificateResponseDTO::new).toList();
-
-        return ResponseEntity.ok(certificates);
-    }
-
     @PatchMapping
     public ResponseEntity<UserResponseDTO> updateUser(@RequestBody @Valid UpdateUserDTO data){
         User updatedUser = userService.updateUser(data);
