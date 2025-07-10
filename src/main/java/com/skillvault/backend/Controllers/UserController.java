@@ -52,18 +52,30 @@ public class UserController {
     }
 
     @GetMapping("/skills")
-    public ResponseEntity<List<SkillResponseDTO>> getValidatedSkills(@RequestParam(required = false) Boolean validated){
+    public ResponseEntity<List<SkillResponseDTO>> getSkills(
+            @RequestParam(required = false) Boolean validated,
+            @RequestParam(required = false) Boolean pending,
+            @RequestParam(required = false) Boolean reproved
+    ) {
         User user = tokenService.getLoggedEntity();
 
-        List<Skill> skills = user.getSkills();
+        List<Skill> userSkills = user.getSkills();
 
-        if (validated != null && validated) {
-            skills = skills.stream()
-                    .filter(skill -> skill.getStatus().equals(SkillStatus.APPROVED))
-                    .toList();
+        if (validated == null && pending == null && reproved == null) {
+            return ResponseEntity.ok(
+                    userSkills.stream().map(SkillResponseDTO::new).toList()
+            );
         }
 
-        List<SkillResponseDTO> response = skills.stream()
+        List<Skill> filteredSkills = userSkills.stream()
+                .filter(skill ->
+                        (Boolean.TRUE.equals(validated) && skill.getStatus().equals(SkillStatus.APPROVED)) ||
+                                (Boolean.TRUE.equals(pending) && skill.getStatus().equals(SkillStatus.PENDING)) ||
+                                (Boolean.TRUE.equals(reproved) && skill.getStatus().equals(SkillStatus.REPROVED))
+                )
+                .toList();
+
+        List<SkillResponseDTO> response = filteredSkills.stream()
                 .map(SkillResponseDTO::new)
                 .toList();
 
