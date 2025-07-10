@@ -1,11 +1,14 @@
 package com.skillvault.backend.Controllers;
 
+import com.skillvault.backend.Domain.Enums.SkillStatus;
+import com.skillvault.backend.Domain.Skill;
 import com.skillvault.backend.Domain.User;
 import com.skillvault.backend.Services.AzureService;
 import com.skillvault.backend.Services.TokenService;
 import com.skillvault.backend.Services.UserService;
 import com.skillvault.backend.dtos.Requests.UpdateUserDTO;
 import com.skillvault.backend.dtos.Responses.CertificateResponseDTO;
+import com.skillvault.backend.dtos.Responses.SkillResponseDTO;
 import com.skillvault.backend.dtos.Responses.UserResponseDTO;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -46,6 +49,37 @@ public class UserController {
     public ResponseEntity<UserResponseDTO> getCurrentUser(){
         User user = tokenService.getLoggedEntity();
         return ResponseEntity.ok(new UserResponseDTO(user));
+    }
+
+    @GetMapping("/skills")
+    public ResponseEntity<List<SkillResponseDTO>> getSkills(
+            @RequestParam(required = false) Boolean validated,
+            @RequestParam(required = false) Boolean pending,
+            @RequestParam(required = false) Boolean reproved
+    ) {
+        User user = tokenService.getLoggedEntity();
+
+        List<Skill> userSkills = user.getSkills();
+
+        if (validated == null && pending == null && reproved == null) {
+            return ResponseEntity.ok(
+                    userSkills.stream().map(SkillResponseDTO::new).toList()
+            );
+        }
+
+        List<Skill> filteredSkills = userSkills.stream()
+                .filter(skill ->
+                        (Boolean.TRUE.equals(validated) && skill.getStatus().equals(SkillStatus.APPROVED)) ||
+                                (Boolean.TRUE.equals(pending) && skill.getStatus().equals(SkillStatus.PENDING)) ||
+                                (Boolean.TRUE.equals(reproved) && skill.getStatus().equals(SkillStatus.REPROVED))
+                )
+                .toList();
+
+        List<SkillResponseDTO> response = filteredSkills.stream()
+                .map(SkillResponseDTO::new)
+                .toList();
+
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/certificates")
