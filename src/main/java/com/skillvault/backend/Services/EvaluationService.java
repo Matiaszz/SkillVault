@@ -100,13 +100,7 @@ public class EvaluationService {
         User targetUser = userRepository.findById(id).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found."));
 
-        Page<Evaluation> evaluations = evaluationRepository.findByEvaluatedUser(targetUser, pageable);
-
-        if (evaluations.isEmpty()){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "This user don't have any evaluation.");
-        }
-
-        return evaluations;
+        return evaluationRepository.findByEvaluatedUser(targetUser, pageable);
 
     }
 
