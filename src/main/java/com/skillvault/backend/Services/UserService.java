@@ -18,6 +18,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.UUID;
+
 @Slf4j
 @Service
 @AllArgsConstructor
@@ -58,10 +60,14 @@ public class UserService {
         } catch (AuthenticationException e) {
             log.error("Login failed for user: {}", dto.email());
             throw new ResponseStatusException(
-                    HttpStatus.UNAUTHORIZED, "Invalid username or password or company is disabled");
+                    HttpStatus.UNAUTHORIZED, "Invalid password");
         }
 
         return (User) authentication.getPrincipal();
+    }
+
+    public User getUserById(UUID id){
+        return userRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
     }
 
     @Transactional

@@ -23,6 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.UUID;
 
 import static com.skillvault.backend.Utils.FileUtils.validateProfileImageExtension;
 
@@ -53,6 +54,15 @@ public class UserController {
         azureService.uploadProfilePicture(user, file);
         return ResponseEntity.ok().build();
     }
+
+    @Operation(summary = "Get information of the provided user ID")
+    @ApiResponse(responseCode = "200", description = "User information retrieved successfully")
+    @GetMapping("/{id}")
+    public ResponseEntity<UserResponseDTO> getUserById(@PathVariable UUID id){
+        User user = userService.getUserById(id);
+        return ResponseEntity.ok(new UserResponseDTO(user));
+    }
+
 
     @Operation(summary = "Get information of the currently authenticated user")
     @ApiResponse(responseCode = "200", description = "User information retrieved successfully")
