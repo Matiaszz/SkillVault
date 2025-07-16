@@ -1,6 +1,6 @@
 package com.skillvault.backend.dtos.Responses;
 
-import com.skillvault.backend.Controllers.Notification;
+import com.skillvault.backend.Domain.Notification;
 
 import java.time.Duration;
 import java.time.LocalDateTime;

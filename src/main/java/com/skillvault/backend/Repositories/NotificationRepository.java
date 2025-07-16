@@ -1,6 +1,6 @@
 package com.skillvault.backend.Repositories;
 
-import com.skillvault.backend.Controllers.Notification;
+import com.skillvault.backend.Domain.Notification;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

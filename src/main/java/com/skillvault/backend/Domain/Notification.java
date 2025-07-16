@@ -1,6 +1,5 @@
-package com.skillvault.backend.Controllers;
+package com.skillvault.backend.Domain;
 
-import com.skillvault.backend.Domain.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

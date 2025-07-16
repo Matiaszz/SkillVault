@@ -1,10 +1,9 @@
 package com.skillvault.backend.Services;
 
-import com.skillvault.backend.Controllers.Notification;
+import com.skillvault.backend.Domain.Notification;
 import com.skillvault.backend.Repositories.NotificationRepository;
 import com.skillvault.backend.Repositories.UserRepository;
 import com.skillvault.backend.dtos.Requests.NotificationRequestDTO;
-import com.skillvault.backend.dtos.Responses.NotificationResponseDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
