@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.skillvault.backend.Domain.Enums.UserRole;
 import com.skillvault.backend.Validations.Password.Password;
+import com.skillvault.backend.dtos.Requests.UpdateUserDTO;
 import com.skillvault.backend.dtos.Requests.UserRequestDTO;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -98,6 +99,16 @@ public class User implements UserDetails {
         return this.username;
     }
 
+    public void updateFromDTO(UpdateUserDTO dto) {
+        if (dto.name() != null && !dto.name().isBlank()) this.name = dto.name();
+        if (dto.email() != null && !dto.email().isBlank()) this.email = dto.email();
+        if (dto.biography() != null) this.biography = dto.biography();
+        if (dto.linkedin() != null) this.linkedin = dto.linkedin();
+        if (dto.instagram() != null) this.instagram = dto.instagram();
+        if (dto.github() != null) this.github = dto.github();
+        if (dto.site() != null) this.site = dto.site();
+
+    }
     public User(UserRequestDTO dto, UserRole role){
         this.username = dto.username();
         this.email = dto.email();

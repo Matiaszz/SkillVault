@@ -41,6 +41,7 @@ public class UserService {
         }
 
         User user = new User(dto, role);
+        // talvz aqui, chamar um método chamado "codificarSenha"? mas não posso usar passwordEncoder na entity User, então seria a mesma coisa que um set?
         String encodedPassword = passwordEncoder.encode(dto.password());
         user.setPassword(encodedPassword);
 
@@ -78,15 +79,7 @@ public class UserService {
 
         if (dto == null) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Missing user data for update");
 
-
-        if (dto.name() != null && !dto.name().isBlank()) user.setName(dto.name());
-        if (dto.email() != null && !dto.email().isBlank()) user.setEmail(dto.email());
-        if (dto.biography() != null) user.setBiography(dto.biography());
-        if (dto.linkedin() != null) user.setLinkedin(dto.linkedin());
-        if (dto.instagram() != null) user.setInstagram(dto.instagram());
-        if (dto.github() != null) user.setGithub(dto.github());
-        if (dto.site() != null) user.setSite(dto.site());
-
+        user.updateFromDTO(dto);
 
         return userRepository.save(user);
     }
