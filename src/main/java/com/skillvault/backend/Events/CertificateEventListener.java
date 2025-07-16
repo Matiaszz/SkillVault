@@ -15,4 +15,9 @@ public class CertificateEventListener {
     public void handleNewCertificateUploaded(NewCertificateUploadedEvent event) {
         emailService.notifyEvaluatorsAboutNewCertificate(event.getCertificate());
     }
+
+    @EventListener
+    public void handleCompletedEvaluation(NewEvaluationCompletedEvent event) {
+        emailService.notifyAdminsAboutEvaluationCompleted(event.getEvaluation());
+    }
 }
