@@ -26,22 +26,19 @@ import java.util.UUID;
 public class AzureService {
     private final BlobContainerClient certificateContainerClient;
     private final BlobContainerClient profilePictureContainerClient;
-    private final UserRepository userRepository;
+    private final UserProfilePictureRepository userProfilePictureRepository;
 
     public AzureService(
             UserProfilePictureRepository profilePictureRepository,
-            UserRepository userRepository,
             @Value("${azure.storage.connection-string}") String connectionString,
             @Value("${azure.storage.certificate.container-name}") String certificateContainer,
             @Value("${azure.storage.profile-picture.container-name}") String profilePictureContainer
-
     ) {
 
         BlobServiceClient serviceClient = new BlobServiceClientBuilder()
                 .connectionString(connectionString).buildClient();
 
-        this.userRepository = userRepository;
-
+        this.userProfilePictureRepository = profilePictureRepository;
         this.profilePictureContainerClient = serviceClient.getBlobContainerClient(profilePictureContainer);
         this.certificateContainerClient = serviceClient.getBlobContainerClient(certificateContainer);
 
@@ -62,27 +59,39 @@ public class AzureService {
             UserProfilePicture profilePicture = user.getProfilePicture();
             if (profilePicture == null) {
                 profilePicture = new UserProfilePicture();
-                profilePicture.setId(UUID.randomUUID());
                 profilePicture.setUser(user);
+                user.setProfilePicture(profilePicture);
+                userProfilePictureRepository.save(profilePicture);
             }
 
-            String blobId = profilePicture.getId() + "_" + file.getOriginalFilename();
-            getPictureBlobClient(profilePicture).upload(new ByteArrayInputStream(data), data.length, true);
+            String fileName = file.getOriginalFilename();
 
+            if (fileName == null ) {
+                fileName = "default";
+            }
 
+            String blobId = profilePicture.getId() + "_" + fileName.trim();
             profilePicture.setBlobName(blobId);
-            user.setProfilePicture(profilePicture);
-            userRepository.save(user);
 
+            getPictureBlobClient(blobId).upload(new ByteArrayInputStream(data), data.length, true);
+
+            userProfilePictureRepository.save(profilePicture);
         } catch (IOException e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error on picture reading.");
         }
     }
 
+
     public ByteArrayResource downloadCertificate(String blobName){
         byte[] data = getCertificateBlobClient(blobName).downloadContent().toBytes();
         return new ByteArrayResource(data);
     }
+
+    public ByteArrayResource downloadProfilePicture(String blobName){
+        byte[] data = getPictureBlobClient(blobName).downloadContent().toBytes();
+        return new ByteArrayResource(data);
+    }
+
     public void uploadCertificate(String blobName, byte[] data) {
         getCertificateBlobClient(blobName)
                 .upload(new ByteArrayInputStream(data), data.length, true);
@@ -96,8 +105,7 @@ public class AzureService {
         return certificateContainerClient.getBlobClient(blobName);
     }
 
-    private BlobClient getPictureBlobClient(UserProfilePicture picture) {
-        String uniqueBlobName = picture.getBlobName();
-        return profilePictureContainerClient.getBlobClient(uniqueBlobName);
+    private BlobClient getPictureBlobClient(String blobName) {
+        return profilePictureContainerClient.getBlobClient(blobName);
     }
 }

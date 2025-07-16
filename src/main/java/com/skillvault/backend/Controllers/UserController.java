@@ -16,7 +16,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -53,6 +55,14 @@ public class UserController {
         User user = tokenService.getLoggedEntity();
         azureService.uploadProfilePicture(user, file);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/profilePicture/{blobName}")
+    public ResponseEntity<ByteArrayResource> getProfilePicture(@PathVariable String blobName) {
+        ByteArrayResource imageBytes = azureService.downloadProfilePicture(blobName);
+        return ResponseEntity.ok()
+                .contentType(MediaType.IMAGE_JPEG)
+                .body(imageBytes);
     }
 
     @Operation(summary = "Get information of the provided user ID")
