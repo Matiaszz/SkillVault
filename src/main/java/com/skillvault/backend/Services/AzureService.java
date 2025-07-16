@@ -62,20 +62,24 @@ public class AzureService {
                 profilePicture.setUser(user);
                 user.setProfilePicture(profilePicture);
                 userProfilePictureRepository.save(profilePicture);
+            } else {
+                if (profilePicture.getBlobName() != null) {
+                    getPictureBlobClient(profilePicture.getBlobName()).deleteIfExists();
+                }
             }
 
             String fileName = file.getOriginalFilename();
-
-            if (fileName == null ) {
+            if (fileName == null || fileName.trim().isEmpty()) {
                 fileName = "default";
             }
 
-            String blobId = profilePicture.getId() + "_" + fileName.trim();
+            String blobId = profilePicture.getId() + "_" + fileName.trim().replaceAll(" ", "");
             profilePicture.setBlobName(blobId);
 
             getPictureBlobClient(blobId).upload(new ByteArrayInputStream(data), data.length, true);
 
             userProfilePictureRepository.save(profilePicture);
+
         } catch (IOException e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error on picture reading.");
         }
