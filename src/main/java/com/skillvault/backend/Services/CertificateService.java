@@ -9,6 +9,7 @@ import com.skillvault.backend.Repositories.CertificateRepository;
 import com.skillvault.backend.Repositories.SkillRepository;
 import com.skillvault.backend.Repositories.UserRepository;
 import com.skillvault.backend.dtos.Requests.CertificateRequestDTO;
+import com.skillvault.backend.dtos.Requests.NotificationRequestDTO;
 import com.skillvault.backend.dtos.Responses.CertificateResponseDTO;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
@@ -34,7 +35,7 @@ public class CertificateService {
     private final EmailService emailService;
     private final TokenService tokenService;
     private final UserRepository userRepository;
-
+    private final NotificationService notificationService;
     @Transactional
     public CertificateResponseDTO uploadCertificateWithData(User user, MultipartFile file, CertificateRequestDTO data) {
         try {
@@ -61,8 +62,7 @@ public class CertificateService {
             azureService.uploadCertificate(blobName, bytes);
 
             certificateRepository.save(cert);
-
-            emailService.notifyEvaluatorsAboutNewCertificate(cert);
+            notificationService.notifyByRoleAboutCertificate(cert, UserRole.EVALUATOR);
             return new CertificateResponseDTO(cert);
 
         } catch (IOException e) {
@@ -117,6 +117,7 @@ public class CertificateService {
             certificate.setStatus(EvalResult.PENDING);
 
             certificateRepository.save(certificate);
+            notificationService.notifyByRoleAboutCertificate(certificate, UserRole.EVALUATOR);
             return new CertificateResponseDTO(certificate);
 
         } catch (IOException e) {

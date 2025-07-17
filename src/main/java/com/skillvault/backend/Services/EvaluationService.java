@@ -30,10 +30,10 @@ public class EvaluationService {
 
     private final CertificateRepository certificateRepository;
     private final CertificateService certificateService;
-    private final EmailService emailService;
     private final EvaluationRepository evaluationRepository;
     private final SkillService skillService;
     private final TokenService tokenService;
+    private final NotificationService notificationService;
     private final UserRepository userRepository;
 
 
@@ -91,7 +91,7 @@ public class EvaluationService {
                 .build();
 
         Evaluation evaluation = evaluationRepository.save(evaluationBuild);
-        emailService.notifyAdminsAboutEvaluationCompleted(evaluation);
+        notificationService.notifyUserAboutEvaluation(evaluation);
         return new EvaluationResponseDTO(evaluation);
     }
 

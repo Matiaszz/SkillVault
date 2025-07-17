@@ -8,6 +8,7 @@ import java.util.UUID;
 
 public record NotificationResponseDTO(
         UUID id,
+        String title,
         String message,
         Boolean read,
         String ago
@@ -15,6 +16,7 @@ public record NotificationResponseDTO(
     public NotificationResponseDTO(Notification notification) {
         this(
                 notification.getId(),
+                notification.getTitle(),
                 notification.getMessage(),
                 notification.isRead(),
                 formatTimeAgo(notification.getCreatedAt())
