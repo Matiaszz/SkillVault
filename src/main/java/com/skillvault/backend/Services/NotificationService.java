@@ -57,7 +57,7 @@ public class NotificationService {
                 "A new certificate was sent by " + sender.getName() +
                 " (" + sender.getUsername() + ") and is waiting for an evaluation.\n" +
                 "Access the following link to download the certificate:\n" +
-                endpoint + "/certificate/download/" + certificate.getId();
+                endpoint + "/certificate/download/" + certificate.getBlobName();
     }
 
     private String buildEvaluationStatusUpdatedNotificationText(Evaluation evaluation){

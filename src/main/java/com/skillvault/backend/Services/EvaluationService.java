@@ -20,6 +20,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -80,6 +81,10 @@ public class EvaluationService {
         certificateRepository.save(certificate);
         certificateRepository.flush();
 
+        if (data.title() == null || data.title().isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Title is required.");
+        }
+        LocalDateTime now = LocalDateTime.now();
         Evaluation evaluationBuild = Evaluation.builder()
                 .title(data.title())
                 .evaluator(loggedUser)
@@ -88,7 +93,13 @@ public class EvaluationService {
                 .reprovedSkills(reprovedSkills)
                 .certificate(certificate)
                 .obs(data.obs())
+                .createdAt(now)
+                .updatedAt(now)
                 .build();
+
+        if (!reprovedSkills.isEmpty() && (data.obs() == null || data.obs().isBlank())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Observation is required for reproved skills.");
+        }
 
         Evaluation evaluation = evaluationRepository.save(evaluationBuild);
         notificationService.notifyUserAboutEvaluation(evaluation);
