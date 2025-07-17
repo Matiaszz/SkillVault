@@ -32,7 +32,6 @@ public class CertificateService {
     private final CertificateRepository certificateRepository;
     private final SkillService skillService;
     private final AzureService azureService;
-    private final EmailService emailService;
     private final TokenService tokenService;
     private final UserRepository userRepository;
     private final NotificationService notificationService;
