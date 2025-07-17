@@ -22,8 +22,12 @@ public class Notification {
 
     private UUID userId;
     private String title;
+
+    @Column(length = 1000)
     private String message;
-    private boolean read = false;
+
+    @Column(name = "is_read")
+    private boolean isRead = false;
 
 
     @CreationTimestamp
