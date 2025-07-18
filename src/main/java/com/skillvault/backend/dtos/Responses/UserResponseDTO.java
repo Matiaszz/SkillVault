@@ -21,7 +21,6 @@ public record UserResponseDTO(
         UserProfilePicture profilePicture,
         String linkedin,
         String github,
-        String instagram,
         String site,
         LocalDateTime createdAt,
         LocalDateTime updatedAt
@@ -39,7 +38,6 @@ public record UserResponseDTO(
                 user.getProfilePicture(),
                 user.getLinkedin(),
                 user.getGithub(),
-                user.getInstagram(),
                 user.getSite(),
                 user.getCreatedAt(),
                 user.getUpdatedAt()
