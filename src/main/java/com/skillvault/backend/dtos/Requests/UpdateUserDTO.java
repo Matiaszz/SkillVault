@@ -11,7 +11,6 @@ public record UpdateUserDTO(
 
         String biography,
         String linkedin,
-        String instagram,
         String github,
         String site
 ) {
@@ -21,7 +20,6 @@ public record UpdateUserDTO(
                         user.getEmail(),
                         user.getBiography(),
                         user.getLinkedin(),
-                        user.getInstagram(),
                         user.getGithub(),
                         user.getSite()
                 );

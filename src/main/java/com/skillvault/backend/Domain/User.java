@@ -60,8 +60,6 @@ public class User implements UserDetails {
 
     private String github;
 
-    private String instagram;
-
     private String site;
 
     @Column(nullable = false)
@@ -104,7 +102,6 @@ public class User implements UserDetails {
         if (dto.email() != null && !dto.email().isBlank()) this.email = dto.email();
         if (dto.biography() != null) this.biography = dto.biography();
         if (dto.linkedin() != null) this.linkedin = dto.linkedin();
-        if (dto.instagram() != null) this.instagram = dto.instagram();
         if (dto.github() != null) this.github = dto.github();
         if (dto.site() != null) this.site = dto.site();
 
