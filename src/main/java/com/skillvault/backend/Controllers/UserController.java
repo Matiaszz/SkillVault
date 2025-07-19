@@ -3,11 +3,13 @@ package com.skillvault.backend.Controllers;
 import com.skillvault.backend.Domain.Enums.SkillStatus;
 import com.skillvault.backend.Domain.Skill;
 import com.skillvault.backend.Domain.User;
+import com.skillvault.backend.Domain.UserProfilePicture;
 import com.skillvault.backend.Services.AzureService;
 import com.skillvault.backend.Services.TokenService;
 import com.skillvault.backend.Services.UserService;
 import com.skillvault.backend.dtos.Requests.UpdateUserDTO;
 import com.skillvault.backend.dtos.Responses.SkillResponseDTO;
+import com.skillvault.backend.dtos.Responses.UserProfileResponseDTO;
 import com.skillvault.backend.dtos.Responses.UserResponseDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -71,6 +73,14 @@ public class UserController {
     public ResponseEntity<UserResponseDTO> getUserById(@PathVariable UUID id){
         User user = userService.getUserById(id);
         return ResponseEntity.ok(new UserResponseDTO(user));
+    }
+
+    @Operation(summary = "Get information of the provided user ID")
+    @ApiResponse(responseCode = "200", description = "User information retrieved successfully")
+    @GetMapping("/profile/{id}")
+    public ResponseEntity<UserProfileResponseDTO> getProfileUser(@PathVariable UUID id){
+        User user = userService.getUserById(id);
+        return ResponseEntity.ok(new UserProfileResponseDTO(user));
     }
 
 

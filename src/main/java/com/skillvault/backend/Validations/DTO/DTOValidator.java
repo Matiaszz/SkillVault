@@ -7,6 +7,7 @@ import com.skillvault.backend.dtos.Requests.UserRequestDTO;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.Scanner;
 import java.util.List;
 
 @Component
@@ -36,7 +37,6 @@ public class DTOValidator {
         if (dto.email() == null || dto.email().isEmpty()) errors.add("Email is required.");
         if (dto.password() == null || dto.password().isEmpty()) errors.add("Password is required.");
         if (dto.username() == null || dto.username().isEmpty()) errors.add("Username is required.");
-
         return errors;
     }
 
