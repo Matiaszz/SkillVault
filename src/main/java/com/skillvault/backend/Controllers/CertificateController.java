@@ -41,8 +41,19 @@ public class CertificateController {
     @GetMapping("/my")
     public ResponseEntity<Page<CertificateResponseDTO>> getUserCertificates(Pageable pageable) {
         UUID userId = tokenService.getLoggedEntity().getId();
-        Page<Certificate> certificatesPage = certificateService.getCertificatesByUser(userId, pageable);
-        Page<CertificateResponseDTO> dtoPage = certificatesPage.map(CertificateResponseDTO::new);
+        Page<CertificateResponseDTO> dtoPage = getPageByUserId(userId, pageable);
+        return ResponseEntity.ok(dtoPage);
+    }
+
+    @Operation(summary = "Get logged-in user's certificates", description = "Returns a paginated list of certificates that belong to the currently authenticated user.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Certificates retrieved successfully"),
+            @ApiResponse(responseCode = "204", description = "No certificates found"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized")
+    })
+    @GetMapping("/by-user/{userId}")
+    public ResponseEntity<Page<CertificateResponseDTO>> getCertificatesByUserId(@PathVariable UUID userId, Pageable pageable){
+        Page<CertificateResponseDTO> dtoPage = getPageByUserId(userId, pageable);
         return ResponseEntity.ok(dtoPage);
     }
 
@@ -97,6 +108,7 @@ public class CertificateController {
                 .body(resource);
     }
 
+
     @Operation(summary = "Update certificate", description = "Updates an existing certificate's file and skill data.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Certificate updated successfully"),
@@ -131,5 +143,10 @@ public class CertificateController {
     public ResponseEntity<Void> deleteCertificate(@PathVariable UUID certificateId){
         certificateService.deleteCertificate(certificateId);
         return ResponseEntity.noContent().build();
+    }
+
+    private Page<CertificateResponseDTO> getPageByUserId(UUID userId, Pageable pageable){
+        Page<Certificate> certificatesPage = certificateService.getCertificatesByUser(userId, pageable);
+        return certificatesPage.map(CertificateResponseDTO::new);
     }
 }

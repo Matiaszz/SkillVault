@@ -3,6 +3,7 @@ package com.skillvault.backend.dtos.Responses;
 import com.skillvault.backend.Domain.User;
 
 public record UserProfileResponseDTO(
+        String id,
         String username,
         String profilePictureBlobName,
         String name,
@@ -13,6 +14,7 @@ public record UserProfileResponseDTO(
 ) {
     public UserProfileResponseDTO(User user) {
         this(
+                user.getId().toString(),
                 user.getUsername(),
                 user.getProfilePicture().getBlobName(),
                 user.getName(),
