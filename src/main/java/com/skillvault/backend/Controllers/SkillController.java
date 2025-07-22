@@ -60,6 +60,15 @@ public class SkillController {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(summary = "Get skills of the currently authenticated user")
+    @ApiResponse(responseCode = "200", description = "Skills retrieved successfully")
+    @GetMapping("/by-user/{userId}")
+    public ResponseEntity<Page<SkillResponseDTO>> getUserSkillsById(@PathVariable UUID userId, Pageable pageable) {
+        Page<Skill> skills = skillService.getUserSkills(userId, pageable);
+        Page<SkillResponseDTO> response = skills.map(SkillResponseDTO::new);
+        return ResponseEntity.ok(response);
+    }
+
     @Operation(summary = "Update a skill by ID")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Skill updated successfully"),
