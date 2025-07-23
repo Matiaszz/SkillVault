@@ -1,9 +1,21 @@
+# Stage 1 - Build
+FROM maven:3.9-eclipse-temurin-21-alpine AS builder
+
+WORKDIR /app/SkillVault
+COPY . /app
+
+RUN echo "[SkillVault] - BUILDING..."
+RUN ./mvnw clean package -DskipTests
 
 FROM eclipse-temurin:21-jdk-alpine
 
 WORKDIR /app
-COPY SkillVault/target/backend-0.0.1-SNAPSHOT.jar app.jar
+
+COPY --from=builder /app/SkillVault/target/backend-0.0.1-SNAPSHOT.jar app.jar
 COPY Docker/backend/wait-connection.sh wait-connection.sh
+
 RUN chmod +x wait-connection.sh
+
 EXPOSE 8080
+
 ENTRYPOINT ["./wait-connection.sh", "mysql", "3306", "--", "java", "-jar", "app.jar"]
