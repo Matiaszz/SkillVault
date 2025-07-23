@@ -14,27 +14,33 @@ services:
     ports:
       - "3306:3306"
     environment:
-      MYSQL_ROOT_PASSWORD: CHANGE-ME
-      MYSQL_DATABASE: skillvault_db
-      MYSQL_USER: CHANGE-ME
-      MYSQL_PASSWORD: CHANGE-ME
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     volumes:
       - mysqldata:/var/lib/mysql
 
   app:
     build:
       context: .
-      dockerfile: Docker/backend/Dockerfile-example
+      dockerfile: ./backend/Dockerfile
     depends_on:
       - mysql
     working_dir: /app
     ports:
       - "8080:8080"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/skillvault_db
-      SPRING_DATASOURCE_USERNAME: CHANGE-ME
-      SPRING_DATASOURCE_PASSWORD: CHANGE-ME
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/${MYSQL_DATABASE}
+      SPRING_DATASOURCE_USERNAME: ${MYSQL_USER}
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD}
     entrypoint: ["java", "-jar", "app.jar"]
+
+    healthcheck:
+      test: ["CMD", "wget --header=\"Accept: application/json\" --spider --quiet http://localhost:8080/actuator/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
 volumes:
   mysqldata:
