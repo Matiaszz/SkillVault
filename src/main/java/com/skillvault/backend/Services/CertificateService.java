@@ -105,7 +105,7 @@ public class CertificateService {
                     .map(dto -> skillService.registerSkill(user, dto))
                     .collect(Collectors.toList());
 
-            certificate.getRequestedSkills().addAll(newSkills);
+            certificate.addSkills(newSkills);
 
             String blobName = certificate.getId() + "_" + originalFilename;
             azureService.deleteByBlobName(certificate.getBlobName());
@@ -136,7 +136,7 @@ public class CertificateService {
 
         for (Skill skill: certificate.getRequestedSkills()){
             skillService.deleteSkillIfExists(skill.getId());
-            user.getSkills().remove(skill);
+            user.removeSkill(skill);
         }
         userRepository.save(user);
         userRepository.flush();

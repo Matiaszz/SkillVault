@@ -68,7 +68,7 @@ public class EvaluationService {
                 ).toList();
 
         for (Skill skill: certificate.getRequestedSkills()){
-            if (skill.getStatus().equals(SkillStatus.PENDING)){
+            if (skill.validateEquality(SkillStatus.PENDING)){
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                         "You as an evaluator must evaluate all the skills, some skills is missing.");
 

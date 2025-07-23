@@ -54,4 +54,8 @@ public class Certificate {
     @Version
     private Integer version;
 
+    public void addSkills(List<Skill> requestedSkills){
+        this.requestedSkills.addAll(requestedSkills);
+    }
+
 }

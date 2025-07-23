@@ -47,4 +47,8 @@ public class Skill {
         this.user = user;
     }
 
+    public boolean validateEquality(SkillStatus status){
+        return this.status.equals(status);
+    }
+
 }

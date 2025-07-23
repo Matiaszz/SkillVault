@@ -58,7 +58,7 @@ public class SkillService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You can't delete others people's skills");
         }
 
-        user.getSkills().remove(skill);
+        user.removeSkill(skill);
 
         skillRepository.delete(skill);
     }

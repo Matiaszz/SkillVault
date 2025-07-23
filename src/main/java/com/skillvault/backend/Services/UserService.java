@@ -41,7 +41,6 @@ public class UserService {
         }
 
         User user = new User(dto, role);
-        // talvz aqui, chamar um método chamado "codificarSenha"? mas não posso usar passwordEncoder na entity User, então seria a mesma coisa que um set?
         String encodedPassword = passwordEncoder.encode(dto.password());
         user.setPassword(encodedPassword);
 
@@ -68,7 +67,8 @@ public class UserService {
     }
 
     public User getUserById(UUID id){
-        return userRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+        return userRepository.findById(id).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
     }
 
     @Transactional
