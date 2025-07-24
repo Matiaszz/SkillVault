@@ -80,6 +80,8 @@ public class SkillService {
 
         if (dto.name() != null && !dto.name().isBlank()) skill.setName(dto.name());
         if (dto.description() != null && !dto.description().isBlank()) skill.setDescription(dto.description());
+        if (dto.isFeatured() != null && !dto.isFeatured().toString().isBlank()) skill.setFeatured(dto.isFeatured());
+
         Skill savedSkill = skillRepository.save(skill);
         skillRepository.flush();
         return savedSkill;

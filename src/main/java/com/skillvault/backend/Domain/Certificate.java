@@ -31,6 +31,8 @@ public class Certificate {
 
     private EvalResult status = EvalResult.PENDING;
 
+    private boolean isFeatured;
+
     @JsonBackReference
     @ManyToOne
     private User user;

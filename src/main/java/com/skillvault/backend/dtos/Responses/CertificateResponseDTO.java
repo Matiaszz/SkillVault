@@ -11,6 +11,7 @@ public record CertificateResponseDTO (
         UUID id,
         String name,
         EvalResult status,
+        Boolean isFeatured,
         UserSimpleDTO user,
         List<SkillResponseDTO> requiredSkills,
         String blobName,
@@ -22,6 +23,7 @@ public record CertificateResponseDTO (
                 certificate.getId(),
                 certificate.getName(),
                 certificate.getStatus(),
+                certificate.isFeatured(),
                 new UserSimpleDTO(certificate.getUser()),
                 certificate.getRequestedSkills() != null
                         ? certificate.getRequestedSkills().stream().map(SkillResponseDTO::new).toList()

@@ -30,6 +30,8 @@ public class Skill {
 
     private SkillStatus status = SkillStatus.PENDING;
 
+    private boolean isFeatured;
+
     @CreationTimestamp
     private LocalDateTime createdAt;
 

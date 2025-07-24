@@ -10,6 +10,7 @@ public record SkillResponseDTO(
         String name,
         String description,
         String status,
+        Boolean isFeatured,
         LocalDateTime createdAt,
         LocalDateTime updatedAt
 ) {
@@ -19,6 +20,7 @@ public record SkillResponseDTO(
                 skill.getName(),
                 skill.getDescription(),
                 skill.getStatus().toString(),
+                skill.isFeatured(),
                 skill.getCreatedAt(),
                 skill.getUpdatedAt()
         );
