@@ -6,13 +6,12 @@ import com.skillvault.backend.Domain.Enums.UserRole;
 import com.skillvault.backend.Domain.Skill;
 import com.skillvault.backend.Domain.User;
 import com.skillvault.backend.Repositories.CertificateRepository;
-import com.skillvault.backend.Repositories.SkillRepository;
 import com.skillvault.backend.Repositories.UserRepository;
 import com.skillvault.backend.dtos.Requests.CertificateRequestDTO;
-import com.skillvault.backend.dtos.Requests.NotificationRequestDTO;
 import com.skillvault.backend.dtos.Responses.CertificateResponseDTO;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,8 +25,8 @@ import static com.skillvault.backend.Utils.FileUtils.validateCertificateExtensio
 import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @AllArgsConstructor
 public class CertificateService {
@@ -37,43 +36,34 @@ public class CertificateService {
     private final TokenService tokenService;
     private final UserRepository userRepository;
     private final NotificationService notificationService;
+
     @Transactional
-    public CertificateResponseDTO uploadCertificateWithData(User user, MultipartFile file, CertificateRequestDTO data) {
-        try {
-            byte[] bytes = file.getBytes();
-
-
-            List<Skill> skills = data.skills().stream()
-                    .map(dto -> skillService.registerSkill(user, dto))
-                    .collect(Collectors.toList());
-
-            Certificate cert = Certificate.builder()
-                    .user(user)
-                    .name(data.name())
-                    .requestedSkills(skills)
-                    .status(EvalResult.PENDING)
-                    .isFeatured(data.isFeatured() != null ? data.isFeatured() : false)
-                    .build();
-
-
-            certificateRepository.save(cert);
-
-            String blobName = cert.getId() + "_" + file.getOriginalFilename();
-            cert.setBlobName(blobName);
-
-            azureService.uploadCertificate(blobName, bytes);
-
-            certificateRepository.save(cert);
-            notificationService.notifyByRoleAboutCertificate(cert, UserRole.EVALUATOR);
-            return new CertificateResponseDTO(cert);
-
-        } catch (IOException e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to process file");
+    public CertificateResponseDTO uploadCertificate(CertificateRequestDTO data){
+        log.warn("=== SKILLS === : {}",data.skills());
+        if (data.skills() == null || data.skills().isEmpty()){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "A certificate must have skills");
         }
+
+        User user = tokenService.getLoggedEntity();
+
+        List<Skill> skills = data.skills().stream().map(dto -> skillService.registerSkill(user, dto))
+                .toList();
+
+        Certificate certificate = Certificate.builder()
+                .user(user)
+                .name(data.name())
+                .requestedSkills(skills)
+                .status(EvalResult.PENDING)
+                .isFeatured(data.isFeatured() != null ? data.isFeatured() : false)
+                .build();
+
+        Certificate cert = certificateRepository.save(certificate);
+
+        return new CertificateResponseDTO(cert);
     }
 
     @Transactional
-    public void updateCertificateAzure(MultipartFile file, UUID certificateId){
+    public void uploadCertificateToAzure(MultipartFile file, UUID certificateId){
         Certificate certificate = certificateRepository.findById(certificateId).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Certificate not found."));
 
@@ -83,10 +73,21 @@ public class CertificateService {
 
         try {
             byte[] bytes = file.getBytes();
-            String blobName = certificateId + "_" + file.getOriginalFilename();
-            azureService.deleteByBlobName(certificate.getBlobName());
+            String originalFilename = file.getOriginalFilename();
+            log.warn("{}", originalFilename);
+
+            if (originalFilename == null || originalFilename.isBlank()) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid file: missing filename");
+            }
+
+            String blobName = certificateId + "_" + originalFilename;
+            log.warn("{}", blobName);
+            if (certificate.getBlobName() != null) azureService.deleteByBlobName(certificate.getBlobName());
+
             azureService.uploadCertificate(blobName, bytes);
+
             certificate.setBlobName(blobName);
+            notificationService.notifyByRoleAboutCertificate(certificate, UserRole.EVALUATOR);
 
         } catch (IOException e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error on file processing");

@@ -1,7 +1,6 @@
 package com.skillvault.backend.Controllers;
 
 import com.skillvault.backend.Domain.Certificate;
-import com.skillvault.backend.Domain.User;
 import com.skillvault.backend.Services.CertificateService;
 import com.skillvault.backend.Services.TokenService;
 import com.skillvault.backend.dtos.Requests.CertificateRequestDTO;
@@ -57,28 +56,10 @@ public class CertificateController {
         return ResponseEntity.ok(dtoPage);
     }
 
-    @Operation(summary = "Upload a certificate", description = "Uploads a certificate file with metadata and requested skills.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Certificate uploaded successfully"),
-            @ApiResponse(responseCode = "400", description = "Invalid or missing certificate file"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized")
-    })
     @PostMapping
-    public ResponseEntity<CertificateResponseDTO> uploadCertificate(
-            @RequestParam("file") MultipartFile file,
-            @ModelAttribute @Valid CertificateRequestDTO data
-    ) {
-        if (file == null || file.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Must have a certificate file");
-        }
-
-        if (!validateCertificateExtension(file)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The certificate must be an Image, DOCX or PDF");
-        }
-
-        User user = tokenService.getLoggedEntity();
-        CertificateResponseDTO response = certificateService.uploadCertificateWithData(user, file, data);
-        return ResponseEntity.ok(response);
+    public ResponseEntity<CertificateResponseDTO> uploadCertificate(@RequestBody CertificateRequestDTO data){
+        CertificateResponseDTO certificate = certificateService.uploadCertificate(data);
+        return ResponseEntity.ok(certificate);
     }
 
     @Operation(summary = "Get certificate by ID", description = "Returns the certificate's details by its ID.")
@@ -110,7 +91,7 @@ public class CertificateController {
 
     @PutMapping("/azure/{id}")
     public ResponseEntity<Void> updateCertificateFile(@RequestParam("file") MultipartFile file, @PathVariable UUID id ){
-        certificateService.updateCertificateAzure(file, id);
+        certificateService.uploadCertificateToAzure(file, id);
         return ResponseEntity.noContent().build();
     }
 
