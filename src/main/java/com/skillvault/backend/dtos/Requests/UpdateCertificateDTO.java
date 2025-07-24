@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.UUID;
 
 public record UpdateCertificateDTO(
-        String name, List<UUID> skills, Boolean isFeatured
+        String name, List<CertificateSkillUpdateDTO> skills, Boolean isFeatured
 ) {
 
 }

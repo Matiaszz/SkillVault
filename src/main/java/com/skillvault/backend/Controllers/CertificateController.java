@@ -4,6 +4,7 @@ import com.skillvault.backend.Domain.Certificate;
 import com.skillvault.backend.Services.CertificateService;
 import com.skillvault.backend.Services.TokenService;
 import com.skillvault.backend.dtos.Requests.CertificateRequestDTO;
+import com.skillvault.backend.dtos.Requests.UpdateCertificateDTO;
 import com.skillvault.backend.dtos.Responses.CertificateResponseDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -89,12 +90,6 @@ public class CertificateController {
                 .body(resource);
     }
 
-    @PutMapping("/azure/{id}")
-    public ResponseEntity<Void> updateCertificateFile(@RequestParam("file") MultipartFile file, @PathVariable UUID id ){
-        certificateService.uploadCertificateToAzure(file, id);
-        return ResponseEntity.noContent().build();
-    }
-
     @Deprecated
     @Operation(summary = "Update certificate", description = "Updates an existing certificate's file and skill data.")
     @ApiResponses(value = {
@@ -103,10 +98,15 @@ public class CertificateController {
             @ApiResponse(responseCode = "403", description = "User not authorized to update this certificate"),
             @ApiResponse(responseCode = "404", description = "Certificate not found")
     })
-    @PutMapping("/{certificateId}")
-    public ResponseEntity<CertificateResponseDTO> updateCertificate(
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<CertificateResponseDTO> updateCertificateData(@PathVariable UUID id, @RequestBody UpdateCertificateDTO data){
+        return ResponseEntity.ok(certificateService.updateCertificateData(id, data));
+    }
+
+    @PutMapping("/azure/update/{certificateId}")
+    public ResponseEntity<CertificateResponseDTO> updateCertificateFile(
             @PathVariable UUID certificateId,
-            @ModelAttribute @Valid CertificateRequestDTO data,
             @RequestParam("file") MultipartFile file){
 
         if (file == null || file.isEmpty()) {
@@ -117,9 +117,9 @@ public class CertificateController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The certificate must be an Image, DOCX or PDF");
         }
 
-        // CertificateResponseDTO response = certificateService.updateCertificate(certificateId, file, data);
+        CertificateResponseDTO response = certificateService.uploadCertificateToAzure(file, certificateId);
 
-        throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, "Service under maintence");
+        return ResponseEntity.ok(response);
     }
 
     @Operation(summary = "Delete certificate", description = "Deletes a certificate from the system including file and associated skills.")

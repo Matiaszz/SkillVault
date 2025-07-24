@@ -9,6 +9,11 @@ public record SkillRequestDTO(
         String name,
 
         @NotBlank(message = "Skill descriptions must be specified")
-        String description
+        String description,
+
+        Boolean featured
 ) {
+        public SkillRequestDTO(CertificateSkillUpdateDTO dto) {
+                this(dto.name(), dto.description(), dto.isFeatured());
+        }
 }

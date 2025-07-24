@@ -6,8 +6,12 @@ import com.skillvault.backend.Domain.Enums.UserRole;
 import com.skillvault.backend.Domain.Skill;
 import com.skillvault.backend.Domain.User;
 import com.skillvault.backend.Repositories.CertificateRepository;
+import com.skillvault.backend.Repositories.SkillRepository;
 import com.skillvault.backend.Repositories.UserRepository;
 import com.skillvault.backend.dtos.Requests.CertificateRequestDTO;
+import com.skillvault.backend.dtos.Requests.CertificateSkillUpdateDTO;
+import com.skillvault.backend.dtos.Requests.SkillRequestDTO;
+import com.skillvault.backend.dtos.Requests.UpdateCertificateDTO;
 import com.skillvault.backend.dtos.Responses.CertificateResponseDTO;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
@@ -23,8 +27,8 @@ import org.springframework.web.server.ResponseStatusException;
 import static com.skillvault.backend.Utils.FileUtils.validateCertificateExtension;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -35,6 +39,7 @@ public class CertificateService {
     private final AzureService azureService;
     private final TokenService tokenService;
     private final UserRepository userRepository;
+    private final SkillRepository skillRepository;
     private final NotificationService notificationService;
 
     @Transactional
@@ -63,7 +68,7 @@ public class CertificateService {
     }
 
     @Transactional
-    public void uploadCertificateToAzure(MultipartFile file, UUID certificateId){
+    public CertificateResponseDTO uploadCertificateToAzure(MultipartFile file, UUID certificateId){
         Certificate certificate = certificateRepository.findById(certificateId).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Certificate not found."));
 
@@ -88,10 +93,32 @@ public class CertificateService {
 
             certificate.setBlobName(blobName);
             notificationService.notifyByRoleAboutCertificate(certificate, UserRole.EVALUATOR);
+            return new CertificateResponseDTO(certificate);
 
         } catch (IOException e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error on file processing");
         }
+    }
+
+    @Transactional
+    public CertificateResponseDTO updateCertificateData(UUID id, UpdateCertificateDTO data) {
+        Certificate certificate = certificateRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Certificate not found for update."));
+
+        User user = certificate.getUser();
+
+        if (data.name() != null && !data.name().isBlank()) {
+            certificate.setName(data.name());
+        }
+
+        if (data.isFeatured() != null) {
+            certificate.setFeatured(data.isFeatured());
+        }
+
+        // Make the skill update logic here
+
+        Certificate updated = certificateRepository.save(certificate);
+        return new CertificateResponseDTO(updated);
     }
 
     public ByteArrayResource downloadCertificate(UUID certificateId){
