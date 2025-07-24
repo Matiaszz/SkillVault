@@ -121,6 +121,7 @@ public class CertificateController {
             @PathVariable UUID certificateId,
             @ModelAttribute @Valid CertificateRequestDTO data,
             @RequestParam("file") MultipartFile file){
+
         if (file == null || file.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Must have a certificate file");
         }
@@ -129,8 +130,9 @@ public class CertificateController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The certificate must be an Image, DOCX or PDF");
         }
 
-        CertificateResponseDTO response = certificateService.updateCertificate(certificateId, file, data);
-        return ResponseEntity.ok(response);
+        // CertificateResponseDTO response = certificateService.updateCertificate(certificateId, file, data);
+
+        throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, "Service under maintence");
     }
 
     @Operation(summary = "Delete certificate", description = "Deletes a certificate from the system including file and associated skills.")

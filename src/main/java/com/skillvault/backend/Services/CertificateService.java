@@ -50,6 +50,7 @@ public class CertificateService {
                     .name(data.name())
                     .requestedSkills(skills)
                     .status(EvalResult.PENDING)
+                    .isFeatured(data.isFeatured() != null ? data.isFeatured() : false)
                     .build();
 
 
@@ -73,55 +74,6 @@ public class CertificateService {
         Certificate certificate = getCertificateById(certificateId);
 
        return azureService.downloadCertificate(certificate.getBlobName());
-    }
-
-
-    @Transactional
-    public CertificateResponseDTO updateCertificate(UUID id, MultipartFile file, CertificateRequestDTO data) {
-        User user = tokenService.getLoggedEntity();
-        Certificate certificate = getCertificateById(id);
-
-        try {
-            byte[] bytes = file.getBytes();
-
-            if (!user.getId().equals(certificate.getUser().getId()) && !user.getRole().equals(UserRole.ADMIN)) {
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You can't update others people's certificates");
-            }
-
-            String originalFilename = file.getOriginalFilename();
-            if (originalFilename == null || originalFilename.isBlank()) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "File must have a valid name");
-            }
-
-            List<Skill> oldSkills = List.copyOf(certificate.getRequestedSkills());
-
-            for (Skill skill : oldSkills) {
-                skillService.deleteSkillIfExists(skill.getId());
-            }
-
-            certificate.getRequestedSkills().clear();
-
-            List<Skill> newSkills = data.skills().stream()
-                    .map(dto -> skillService.registerSkill(user, dto))
-                    .collect(Collectors.toList());
-
-            certificate.addSkills(newSkills);
-
-            String blobName = certificate.getId() + "_" + originalFilename;
-            azureService.deleteByBlobName(certificate.getBlobName());
-            azureService.uploadCertificate(blobName, bytes);
-            certificate.setBlobName(blobName);
-
-            certificate.setName(data.name());
-            certificate.setStatus(EvalResult.PENDING);
-
-            certificateRepository.save(certificate);
-            notificationService.notifyByRoleAboutCertificate(certificate, UserRole.EVALUATOR);
-            return new CertificateResponseDTO(certificate);
-
-        } catch (IOException e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to process file");
-        }
     }
 
 
