@@ -108,7 +108,13 @@ public class CertificateController {
                 .body(resource);
     }
 
+    @PutMapping("/azure/{id}")
+    public ResponseEntity<Void> updateCertificateFile(@RequestParam("file") MultipartFile file, @PathVariable UUID id ){
+        certificateService.updateCertificateAzure(file, id);
+        return ResponseEntity.noContent().build();
+    }
 
+    @Deprecated
     @Operation(summary = "Update certificate", description = "Updates an existing certificate's file and skill data.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Certificate updated successfully"),

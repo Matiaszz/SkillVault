@@ -21,6 +21,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import static com.skillvault.backend.Utils.FileUtils.validateCertificateExtension;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
@@ -67,6 +69,27 @@ public class CertificateService {
 
         } catch (IOException e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to process file");
+        }
+    }
+
+    @Transactional
+    public void updateCertificateAzure(MultipartFile file, UUID certificateId){
+        Certificate certificate = certificateRepository.findById(certificateId).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Certificate not found."));
+
+        if (!isValidFile(file)){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Certificate must be an Image, Docx or PDF");
+        }
+
+        try {
+            byte[] bytes = file.getBytes();
+            String blobName = certificateId + "_" + file.getOriginalFilename();
+            azureService.deleteByBlobName(certificate.getBlobName());
+            azureService.uploadCertificate(blobName, bytes);
+            certificate.setBlobName(blobName);
+
+        } catch (IOException e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error on file processing");
         }
     }
 
@@ -121,5 +144,15 @@ public class CertificateService {
         if (hasReproved) return EvalResult.PARTIALLY_APPROVED;
         return EvalResult.APPROVED;
     }
+
+    private boolean isValidFile(MultipartFile file) {
+        String originalFilename = file.getOriginalFilename();
+        if (originalFilename == null || originalFilename.isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "File must have a valid name");
+        }
+        return validateCertificateExtension(file);
+
+    }
+
 
 }
