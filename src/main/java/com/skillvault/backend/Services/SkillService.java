@@ -26,6 +26,7 @@ import java.util.UUID;
 public class SkillService {
 
     private final SkillRepository skillRepository;
+    private final CertificateService certificateService;
     private final TokenService tokenService;
     private final UserRepository userRepository;
 
@@ -38,8 +39,9 @@ public class SkillService {
             throw new ResponseStatusException(
                     HttpStatus.CONFLICT, "A skill with the name: '" + skillName + "' already exists");
         }
+        Certificate certificate = certificateService.getCertificateById(UUID.fromString(skillDTO.certificateId()));
 
-        Skill skill = new Skill(skillDTO, user);
+        Skill skill = new Skill(skillDTO, user, certificate);
         Skill savedSkill = skillRepository.save(skill);
         skillRepository.flush();
 

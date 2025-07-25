@@ -48,11 +48,12 @@ public class Skill {
     @JsonBackReference
     private User user;
 
-    public Skill(SkillRequestDTO dto, User user){
+    public Skill(SkillRequestDTO dto, User user, Certificate certificate){
         this.name = dto.name();
         this.description = dto.description();
         this.user = user;
         this.isFeatured = dto.featured() != null ? dto.featured() : false;
+        this.certificate = certificate;
     }
 
     public boolean validateEquality(SkillStatus status){

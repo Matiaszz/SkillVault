@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.List;
+import java.util.UUID;
 
 @Component
 public class DTOValidator {
@@ -24,6 +25,7 @@ public class DTOValidator {
     public static List<String> validateSkillRequest(SkillRequestDTO dto) {
         List<String> errors = new ArrayList<>();
 
+        if (dto.certificateId() == null || dto.certificateId().isEmpty()) errors.add("Certificate ID is required");
         if (dto.name() == null || dto.name().isEmpty()) errors.add("Skill name is required.");
         if (dto.description() == null || dto.description().isEmpty()) errors.add("Skill description is required.");
 
@@ -44,7 +46,8 @@ public class DTOValidator {
         List<String> errors = new ArrayList<>();
 
         if (dto.name() == null || dto.name().isEmpty()) errors.add("Name is required.");
-        if (dto.skills() == null || dto.skills().isEmpty()) errors.add("List of skills is required.");
+        if (dto.isFeatured() == null ) errors.add("featured field is required");
+
         return errors;
     }
 }

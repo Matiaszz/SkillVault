@@ -6,7 +6,6 @@ import com.skillvault.backend.Domain.Enums.UserRole;
 import com.skillvault.backend.Domain.Skill;
 import com.skillvault.backend.Domain.User;
 import com.skillvault.backend.Repositories.CertificateRepository;
-import com.skillvault.backend.Repositories.SkillRepository;
 import com.skillvault.backend.Repositories.UserRepository;
 import com.skillvault.backend.dtos.Requests.CertificateRequestDTO;
 import com.skillvault.backend.dtos.Requests.UpdateCertificateDTO;
@@ -26,36 +25,23 @@ import static com.skillvault.backend.Utils.FileUtils.validateCertificateExtensio
 
 import java.io.IOException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 @AllArgsConstructor
 public class CertificateService {
     private final CertificateRepository certificateRepository;
-    private final SkillService skillService;
     private final AzureService azureService;
     private final TokenService tokenService;
     private final UserRepository userRepository;
-    private final SkillRepository skillRepository;
     private final NotificationService notificationService;
 
-    @Transactional
     public CertificateResponseDTO uploadCertificate(CertificateRequestDTO data){
-        log.warn("=== SKILLS === : {}",data.skills());
-        if (data.skills() == null || data.skills().isEmpty()){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "A certificate must have skills");
-        }
-
         User user = tokenService.getLoggedEntity();
-
-        List<Skill> skills = data.skills().stream().map(dto -> skillService.registerSkill(user, dto))
-                .toList();
 
         Certificate certificate = Certificate.builder()
                 .user(user)
                 .name(data.name())
-                .requestedSkills(skills)
                 .status(EvalResult.PENDING)
                 .isFeatured(data.isFeatured() != null ? data.isFeatured() : false)
                 .build();
@@ -98,7 +84,6 @@ public class CertificateService {
         }
     }
 
-    @Transactional
     public Certificate updateCertificateData(UUID id, UpdateCertificateDTO data) {
         Certificate certificate = certificateRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Certificate not found for update."));
@@ -127,18 +112,11 @@ public class CertificateService {
         Certificate certificate = getCertificateById(id);
 
         if (!user.getId().equals(certificate.getUser().getId()) && !user.getRole().equals(UserRole.ADMIN)){
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You can't delete others people certificates");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You can't delete other people's certificates");
         }
-
-        for (Skill skill: certificate.getRequestedSkills()){
-            skillService.deleteSkillIfExists(skill.getId());
-            user.removeSkill(skill);
-        }
-        userRepository.save(user);
-        userRepository.flush();
-
 
         azureService.deleteByBlobName(certificate.getBlobName());
+
         certificateRepository.delete(certificate);
     }
 

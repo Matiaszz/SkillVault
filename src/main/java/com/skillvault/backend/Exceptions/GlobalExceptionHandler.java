@@ -56,7 +56,7 @@ public class GlobalExceptionHandler {
         ExceptionModel error = new ExceptionModel(
                 HttpStatus.BAD_REQUEST.value(),
                 ex.getClass().getSimpleName(),
-                "Your request URL is invalid, check if you have typed the UUID correctly",
+                "Some ID in your request is invalid, check if you have typed the UUID in the endpoint or in the payload correctly",
                 ex.getMessage()
         );
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
