@@ -9,8 +9,6 @@ import com.skillvault.backend.Repositories.CertificateRepository;
 import com.skillvault.backend.Repositories.SkillRepository;
 import com.skillvault.backend.Repositories.UserRepository;
 import com.skillvault.backend.dtos.Requests.CertificateRequestDTO;
-import com.skillvault.backend.dtos.Requests.CertificateSkillUpdateDTO;
-import com.skillvault.backend.dtos.Requests.SkillRequestDTO;
 import com.skillvault.backend.dtos.Requests.UpdateCertificateDTO;
 import com.skillvault.backend.dtos.Responses.CertificateResponseDTO;
 import jakarta.transaction.Transactional;
@@ -101,11 +99,9 @@ public class CertificateService {
     }
 
     @Transactional
-    public CertificateResponseDTO updateCertificateData(UUID id, UpdateCertificateDTO data) {
+    public Certificate updateCertificateData(UUID id, UpdateCertificateDTO data) {
         Certificate certificate = certificateRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Certificate not found for update."));
-
-        User user = certificate.getUser();
 
         if (data.name() != null && !data.name().isBlank()) {
             certificate.setName(data.name());
@@ -115,10 +111,7 @@ public class CertificateService {
             certificate.setFeatured(data.isFeatured());
         }
 
-        // Make the skill update logic here
-
-        Certificate updated = certificateRepository.save(certificate);
-        return new CertificateResponseDTO(updated);
+        return certificateRepository.save(certificate);
     }
 
     public ByteArrayResource downloadCertificate(UUID certificateId){

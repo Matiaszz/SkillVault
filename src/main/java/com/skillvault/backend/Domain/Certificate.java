@@ -38,7 +38,7 @@ public class Certificate {
     private User user;
 
     @JsonManagedReference
-    @ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+    @OneToMany(mappedBy = "certificate",cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Skill> requestedSkills = new ArrayList<>();
 
     @OneToOne(mappedBy = "certificate", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)

@@ -32,6 +32,11 @@ public class Skill {
 
     private boolean isFeatured;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "certificate_id")
+    @JsonBackReference
+    private Certificate certificate;
+
     @CreationTimestamp
     private LocalDateTime createdAt;
 
@@ -47,6 +52,7 @@ public class Skill {
         this.name = dto.name();
         this.description = dto.description();
         this.user = user;
+        this.isFeatured = dto.featured() != null ? dto.featured() : false;
     }
 
     public boolean validateEquality(SkillStatus status){

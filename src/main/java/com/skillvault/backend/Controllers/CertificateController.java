@@ -101,7 +101,9 @@ public class CertificateController {
 
     @PatchMapping("/{id}")
     public ResponseEntity<CertificateResponseDTO> updateCertificateData(@PathVariable UUID id, @RequestBody UpdateCertificateDTO data){
-        return ResponseEntity.ok(certificateService.updateCertificateData(id, data));
+        Certificate certificate = certificateService.updateCertificateData(id, data);
+        CertificateResponseDTO response = new CertificateResponseDTO(certificate);
+        return ResponseEntity.ok(response);
     }
 
     @PutMapping("/azure/update/{certificateId}")
