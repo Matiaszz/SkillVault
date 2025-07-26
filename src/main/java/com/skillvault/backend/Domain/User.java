@@ -27,6 +27,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Table(name = "users")
 public class User implements UserDetails {
 
     @Id
@@ -116,5 +117,4 @@ public class User implements UserDetails {
     public void removeSkill(Skill skill){
         this.skills.remove(skill);
     }
-
 }
