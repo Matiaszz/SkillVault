@@ -88,6 +88,11 @@ public class CertificateService {
         Certificate certificate = certificateRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Certificate not found for update."));
 
+        User loggedUser = tokenService.getLoggedEntity();
+        if (!loggedUser.getId().equals(certificate.getUser().getId()) && !loggedUser.getRole().equals(UserRole.ADMIN)){
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You can't update other people certificates");
+        }
+
         if (data.name() != null && !data.name().isBlank()) {
             certificate.setName(data.name());
         }
