@@ -28,7 +28,4 @@ public class NotificationController {
         Page<Notification> notifications = notificationService.getNotificationsByUserId(userId, pageable);
         return ResponseEntity.ok(notifications.map(NotificationResponseDTO::new));
     }
-
-
-
 }

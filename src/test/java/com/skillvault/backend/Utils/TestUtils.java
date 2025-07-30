@@ -25,7 +25,7 @@ public class TestUtils {
     private AuthenticationManager authenticationManager;
 
 
-    public void authenticateTest(){
+    public User authenticateTest(){
         this.userRepository.deleteAll();
 
         User admin = new User();
@@ -44,6 +44,7 @@ public class TestUtils {
 
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
+        return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 
 
