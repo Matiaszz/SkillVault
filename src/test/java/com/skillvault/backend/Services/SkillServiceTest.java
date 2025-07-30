@@ -1,6 +1,7 @@
 package com.skillvault.backend.Services;
 
 import com.skillvault.backend.Domain.Certificate;
+import com.skillvault.backend.Domain.Enums.UserRole;
 import com.skillvault.backend.Domain.Skill;
 import com.skillvault.backend.Domain.User;
 import com.skillvault.backend.Repositories.CertificateRepository;
@@ -34,7 +35,9 @@ import static org.assertj.core.api.Assertions.*;
 class SkillServiceTest {
 
     private AutoCloseable closeable;
-    private User userMock;
+    private User userMock1;
+    private User userMock2;
+    private User adminMock;
 
     @Mock
     private TokenService tokenService;
@@ -63,11 +66,15 @@ class SkillServiceTest {
     @BeforeEach
     void setup(){
         closeable = MockitoAnnotations.openMocks(this);
-        userMock = utils.authenticateTest();
+        userMock1 = utils.authenticateTest(UserRole.USER);
+        userMock2 = utils.authenticateTest(UserRole.USER);
+        adminMock = utils.authenticateTest(UserRole.ADMIN);
     }
     @AfterEach
     void tearDown() throws Exception{
-        userMock = null;
+        userMock1 = null;
+        userMock2 = null;
+        adminMock = null;
         closeable.close();
     }
 
@@ -76,7 +83,7 @@ class SkillServiceTest {
     void registerSkillSuccess() {
         Certificate certificate = createCertificate();
         SkillRequestDTO data = new SkillRequestDTO(certificate.getId().toString(), "Skill", "Skill desc", true);
-        Skill sk = skillService.registerSkill(this.userMock, data);
+        Skill sk = skillService.registerSkill(this.userMock1, data);
 
         boolean exists = skillRepository.existsById(sk.getId());
 
@@ -87,20 +94,18 @@ class SkillServiceTest {
     @DisplayName("Should throw the conflict response status")
     void registerSkillConflict() {
         Certificate certificate = createCertificate();
-        registerSkill(certificate);
+        registerSkill(certificate, userMock1);
 
-        assertThatThrownBy(() -> skillService.registerSkill(userMock, makeSkill(certificate))
+        assertThatThrownBy(() -> skillService.registerSkill(userMock1, makeSkill(certificate))
         ).isInstanceOf(ResponseStatusException.class)
                 .hasMessageContaining("already exists");
-
-
     }
 
     @Test
     @DisplayName("Should delete a skill from DB")
     void deleteSkillIfExistsSuccess() {
         Certificate certificate = createCertificate();
-        Skill skill = registerSkill(certificate);
+        Skill skill = registerSkill(certificate, userMock1);
         skillService.deleteSkillIfExists(skill.getId());
 
         boolean skillNotFound = skillRepository.existsById(skill.getId());
@@ -119,13 +124,21 @@ class SkillServiceTest {
     @DisplayName("Should update skill successfully")
     void updateSkillSuccess() {
         Certificate certificate = createCertificate();
-        Skill skill = registerSkill(certificate);
+        Skill skill = registerSkill(certificate, userMock1);
         UpdateSkillDTO data = new UpdateSkillDTO("Changed", null, null);
         skillService.updateSkill(data, skill.getId());
         Optional<Skill> foundSkill = skillRepository.findById(skill.getId());
 
         assertThat(foundSkill.isPresent()).isTrue();
         assertThat(foundSkill.get().getName().equals("Changed")).isTrue();
+    }
+
+    @Test
+    @DisplayName("Shouldn't update skill from DB because ID doesn't exists")
+    void updateSkillFailureNotFound() {;
+        UpdateSkillDTO data = new UpdateSkillDTO("Changed", null, null);
+        assertThatThrownBy(() -> skillService.updateSkill(data, UUID.randomUUID())).isInstanceOf(ResponseStatusException.class)
+                .hasMessageContaining("Skill not found");
     }
 
     @Test
@@ -145,9 +158,9 @@ class SkillServiceTest {
         return certificateRepository.save(c);
     }
 
-    private Skill registerSkill(Certificate certificate){
+    private Skill registerSkill(Certificate certificate, User userMock){
         SkillRequestDTO data = makeSkill(certificate);
-        return skillService.registerSkill(this.userMock, data);
+        return skillService.registerSkill(userMock, data);
     }
 
     private SkillRequestDTO makeSkill(Certificate certificate){

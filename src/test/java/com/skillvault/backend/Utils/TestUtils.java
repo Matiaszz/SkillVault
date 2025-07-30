@@ -25,7 +25,7 @@ public class TestUtils {
     private AuthenticationManager authenticationManager;
 
 
-    public User authenticateTest(){
+    public User authenticateTest(UserRole role){
         this.userRepository.deleteAll();
 
         User admin = new User();
@@ -33,7 +33,7 @@ public class TestUtils {
         admin.setName("adminName");
         admin.setEmail("admin@emial.com");
         admin.setPassword(passwordEncoder.encode("Password@123"));
-        admin.setRole(UserRole.USER);
+        admin.setRole(role);
 
         userRepository.save(admin);
         userRepository.flush();

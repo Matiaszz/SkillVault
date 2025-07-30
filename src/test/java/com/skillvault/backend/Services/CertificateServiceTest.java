@@ -1,6 +1,7 @@
 package com.skillvault.backend.Services;
 
 import com.skillvault.backend.Domain.Certificate;
+import com.skillvault.backend.Domain.Enums.UserRole;
 import com.skillvault.backend.Repositories.CertificateRepository;
 import com.skillvault.backend.Repositories.UserRepository;
 import com.skillvault.backend.config.TestConfig;
@@ -60,7 +61,7 @@ class CertificateServiceTest {
     @BeforeEach
     void setup(){
         closeable = MockitoAnnotations.openMocks(this);
-        utils.authenticateTest();
+        utils.authenticateTest(UserRole.USER);
     }
     @AfterEach
     void tearDown() throws Exception{
