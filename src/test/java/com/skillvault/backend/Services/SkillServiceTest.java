@@ -37,7 +37,6 @@ class SkillServiceTest {
 
     private AutoCloseable closeable;
     private User userMock1;
-    private User adminMock;
 
     @Mock
     private TokenService tokenService;
@@ -66,7 +65,6 @@ class SkillServiceTest {
     @BeforeEach
     void setup(){
         closeable = MockitoAnnotations.openMocks(this);
-        // adminMock = utils.authenticateTest(UserRole.ADMIN, "admin", "admin@email.com");
         userMock1 = utils.authenticateTest(UserRole.USER, "mock1", "mock1@email.com");
     }
     @AfterEach
@@ -102,7 +100,7 @@ class SkillServiceTest {
     }
 
     @Test
-    @DisplayName("Should delete a skill from DB")
+    @DisplayName("Should delete the skill from DB")
     void deleteSkillIfExistsSuccess() {
         Certificate certificate = createCertificate();
         Skill skill = registerSkill(certificate, userMock1);
@@ -113,7 +111,7 @@ class SkillServiceTest {
     }
 
     @Test
-    @DisplayName("Shouldn't delete a skill from DB because ID doesn't exists")
+    @DisplayName("Shouldn't delete the skill from DB because ID doesn't exists")
     void deleteSkillIfExistsFailureNotFound() {
         assertThatThrownBy(() -> skillService.deleteSkillIfExists(UUID.randomUUID()))
                 .isInstanceOf(ResponseStatusException.class)
@@ -121,7 +119,7 @@ class SkillServiceTest {
     }
 
     @Test
-    @DisplayName("Shouldn't delete a skill from DB because the user aren't the skill owner")
+    @DisplayName("Shouldn't delete the skill from DB because the user aren't the skill owner")
     void deleteSkillIfExistsFailurePermission() {
         Certificate certificate = createCertificate();
         Skill skill = registerSkill(certificate, userMock1);
@@ -133,7 +131,7 @@ class SkillServiceTest {
     }
 
     @Test
-    @DisplayName("Should update skill successfully")
+    @DisplayName("Should update the skill successfully")
     void updateSkillSuccess() {
         Certificate certificate = createCertificate();
         Skill skill = registerSkill(certificate, userMock1);
@@ -146,7 +144,7 @@ class SkillServiceTest {
     }
 
     @Test
-    @DisplayName("Shouldn't update skill from DB because ID doesn't exists")
+    @DisplayName("Shouldn't update the skill from DB because ID doesn't exists")
     void updateSkillFailureNotFound() {;
         UpdateSkillDTO data = new UpdateSkillDTO("Changed", null, null);
         assertThatThrownBy(() -> skillService.updateSkill(data, UUID.randomUUID())).isInstanceOf(ResponseStatusException.class)
@@ -154,7 +152,7 @@ class SkillServiceTest {
     }
 
     @Test
-    @DisplayName("Shouldn't update skill from DB because ID doesn't exists")
+    @DisplayName("Shouldn't update the skill from DB because the logged user aren't the owner of the skill")
     void updateSkillFailurePermission() {;
         Certificate certificate = createCertificate();
         Skill skill = registerSkill(certificate, userMock1);
@@ -163,6 +161,21 @@ class SkillServiceTest {
         UpdateSkillDTO data = new UpdateSkillDTO("Changed", null, null);
         assertThatThrownBy(() -> skillService.updateSkill(data, skill.getId())).isInstanceOf(ResponseStatusException.class)
                 .hasMessageContaining("You aren't allowed to access this skill");
+    }
+
+    @Test
+    @DisplayName("Should update the skill from DB because the logged user is an admin")
+    void updateSkillSuccessPermission() {;
+        Certificate certificate = createCertificate();
+        Skill skill = registerSkill(certificate, userMock1);
+        utils.authenticateTest(UserRole.ADMIN, "adm", "adm@email.com");
+
+        UpdateSkillDTO data = new UpdateSkillDTO("Changed", null, null);
+        skillService.updateSkill(data, skill.getId());
+        Optional<Skill> foundSkill = skillRepository.findById(skill.getId());
+
+        assertThat(foundSkill.isPresent()).isTrue();
+        assertThat(foundSkill.get().getName().equals("Changed")).isTrue();
     }
 
 

@@ -2,6 +2,7 @@ package com.skillvault.backend.Services;
 
 import com.skillvault.backend.Domain.Certificate;
 import com.skillvault.backend.Domain.Enums.SkillStatus;
+import com.skillvault.backend.Domain.Enums.UserRole;
 import com.skillvault.backend.Domain.Skill;
 import com.skillvault.backend.Domain.User;
 import com.skillvault.backend.Repositories.SkillRepository;
@@ -73,7 +74,7 @@ public class SkillService {
         Skill skill = skillRepository.findById(id).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Skill not found"));
 
-        if (!user.getId().equals(skill.getUser().getId())){
+        if (!user.getId().equals(skill.getUser().getId()) && !user.getRole().equals(UserRole.ADMIN)){
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You aren't allowed to access this skill");
         }
 
