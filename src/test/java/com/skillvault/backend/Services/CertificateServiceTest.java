@@ -40,7 +40,7 @@ class CertificateServiceTest {
     @Mock
     private TokenService tokenService;
 
-    @Mock
+    @Autowired
     private UserRepository userRepository;
 
     @Mock
@@ -61,10 +61,11 @@ class CertificateServiceTest {
     @BeforeEach
     void setup(){
         closeable = MockitoAnnotations.openMocks(this);
-        utils.authenticateTest(UserRole.USER);
+        utils.authenticateTest(UserRole.USER, "UserName", "email@email.com");
     }
     @AfterEach
     void tearDown() throws Exception{
+        this.userRepository.deleteAll();
         closeable.close();
     }
 

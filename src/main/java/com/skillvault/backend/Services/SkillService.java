@@ -42,10 +42,8 @@ public class SkillService {
         Certificate certificate = certificateService.getCertificateById(UUID.fromString(skillDTO.certificateId()));
 
         Skill skill = new Skill(skillDTO, user, certificate);
-        Skill savedSkill = skillRepository.save(skill);
-        skillRepository.flush();
 
-        return savedSkill;
+        return skillRepository.saveAndFlush(skill);
     }
 
 

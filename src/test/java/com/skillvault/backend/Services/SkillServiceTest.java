@@ -42,7 +42,7 @@ class SkillServiceTest {
     @Mock
     private TokenService tokenService;
 
-    @Mock
+    @Autowired
     private UserRepository userRepository;
 
     @Mock
@@ -66,15 +66,16 @@ class SkillServiceTest {
     @BeforeEach
     void setup(){
         closeable = MockitoAnnotations.openMocks(this);
-        userMock1 = utils.authenticateTest(UserRole.USER);
-        userMock2 = utils.authenticateTest(UserRole.USER);
-        adminMock = utils.authenticateTest(UserRole.ADMIN);
+        userMock2 = utils.authenticateTest(UserRole.USER, "mock2", "mock2@email.com");
+        adminMock = utils.authenticateTest(UserRole.ADMIN, "admin", "admin@email.com");
+        userMock1 = utils.authenticateTest(UserRole.USER, "mock1", "mock1@email.com");
     }
     @AfterEach
     void tearDown() throws Exception{
         userMock1 = null;
         userMock2 = null;
         adminMock = null;
+        this.userRepository.deleteAll();
         closeable.close();
     }
 
@@ -94,10 +95,12 @@ class SkillServiceTest {
     @DisplayName("Should throw the conflict response status")
     void registerSkillConflict() {
         Certificate certificate = createCertificate();
-        registerSkill(certificate, userMock1);
 
-        assertThatThrownBy(() -> skillService.registerSkill(userMock1, makeSkill(certificate))
-        ).isInstanceOf(ResponseStatusException.class)
+        SkillRequestDTO request = makeSkill(certificate);
+        skillService.registerSkill(userMock1, request);
+
+        assertThatThrownBy(() -> skillService.registerSkill(userMock1, request))
+                .isInstanceOf(ResponseStatusException.class)
                 .hasMessageContaining("already exists");
     }
 
@@ -108,8 +111,8 @@ class SkillServiceTest {
         Skill skill = registerSkill(certificate, userMock1);
         skillService.deleteSkillIfExists(skill.getId());
 
-        boolean skillNotFound = skillRepository.existsById(skill.getId());
-        assertThat(skillNotFound).isTrue();
+        boolean skillExists = skillRepository.existsById(skill.getId());
+        assertThat(!skillExists).isTrue();
     }
 
     @Test

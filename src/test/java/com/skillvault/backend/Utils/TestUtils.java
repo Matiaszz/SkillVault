@@ -25,21 +25,18 @@ public class TestUtils {
     private AuthenticationManager authenticationManager;
 
 
-    public User authenticateTest(UserRole role){
-        this.userRepository.deleteAll();
+    public User authenticateTest(UserRole role, String username, String email){
+        User user = new User();
+        user.setUsername(username);
+        user.setName("UserName");
+        user.setEmail(email);
+        user.setPassword(passwordEncoder.encode("Password@123"));
+        user.setRole(role);
 
-        User admin = new User();
-        admin.setUsername("admin");
-        admin.setName("adminName");
-        admin.setEmail("admin@emial.com");
-        admin.setPassword(passwordEncoder.encode("Password@123"));
-        admin.setRole(role);
-
-        userRepository.save(admin);
-        userRepository.flush();
+        userRepository.saveAndFlush(user);
 
 
-        var usernamePassword = new UsernamePasswordAuthenticationToken(admin.getUsername(), "Password@123");
+        var usernamePassword = new UsernamePasswordAuthenticationToken(user.getUsername(), "Password@123");
         var authentication = authenticationManager.authenticate(usernamePassword);
 
 
