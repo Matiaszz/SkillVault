@@ -75,7 +75,7 @@ public class SkillService {
         Skill skill = skillRepository.findById(id).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Skill not found"));
 
-        if (user.getId() != skill.getUser().getId()){
+        if (!user.getId().equals(skill.getUser().getId())){
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You aren't allowed to access this skill");
         }
 

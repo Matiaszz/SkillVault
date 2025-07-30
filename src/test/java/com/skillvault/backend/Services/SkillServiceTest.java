@@ -23,6 +23,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.*;
@@ -116,13 +117,15 @@ class SkillServiceTest {
 
     @Test
     @DisplayName("Should update skill successfully")
-    void updateSkill() {
+    void updateSkillSuccess() {
         Certificate certificate = createCertificate();
         Skill skill = registerSkill(certificate);
         UpdateSkillDTO data = new UpdateSkillDTO("Changed", null, null);
-        Skill updatedSkill = skillService.updateSkill(data, skill.getId());
+        skillService.updateSkill(data, skill.getId());
+        Optional<Skill> foundSkill = skillRepository.findById(skill.getId());
 
-        assertThat(skill.getName().equals(updatedSkill.getName()) && skill.getName().equals("Changed")).isTrue();
+        assertThat(foundSkill.isPresent()).isTrue();
+        assertThat(foundSkill.get().getName().equals("Changed")).isTrue();
     }
 
     @Test

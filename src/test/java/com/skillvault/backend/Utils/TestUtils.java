@@ -33,7 +33,7 @@ public class TestUtils {
         admin.setName("adminName");
         admin.setEmail("admin@emial.com");
         admin.setPassword(passwordEncoder.encode("Password@123"));
-        admin.setRole(UserRole.ADMIN);
+        admin.setRole(UserRole.USER);
 
         userRepository.save(admin);
         userRepository.flush();
