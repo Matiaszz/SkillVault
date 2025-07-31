@@ -21,6 +21,8 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.event.annotation.BeforeTestMethod;
 import org.springframework.web.server.ResponseStatusException;
@@ -181,6 +183,12 @@ class SkillServiceTest {
 
     @Test
     void getUserSkills() {
+        Certificate certificate = createCertificate();
+        registerSkill(certificate, userMock1);
+        Page<Skill> skills = skillService.getUserSkills(userMock1.getId(), Pageable.unpaged());
+        assertThat(skills).isNotEmpty();
+
+        assertThat(skills.getContent()).allMatch(skill -> skill.getUser().getId().equals(userMock1.getId()));
     }
 
     @Test
