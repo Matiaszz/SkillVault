@@ -15,6 +15,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -25,6 +26,7 @@ import static com.skillvault.backend.Utils.FileUtils.validateCertificateExtensio
 
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -138,6 +140,23 @@ public class CertificateService {
         }
 
         return certificateRepository.findByUserId(userId, pageable);
+    }
+
+    public Page<Certificate> getFeaturedCertificatesByUser(UUID userId, Pageable pageable) {
+        boolean exists = userRepository.existsById(userId);
+
+        if (!exists) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
+        }
+
+        Page<Certificate> certificatesPage = certificateRepository.findByUserId(userId, pageable);
+
+        List<Certificate> featuredCertificates = certificatesPage.getContent()
+                .stream()
+                .filter(Certificate::isFeatured)
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(featuredCertificates, pageable, certificatesPage.getTotalElements());
     }
 
     public EvalResult determineEvalResult(List<Skill> approvedSkills, List<Skill> reprovedSkills) {

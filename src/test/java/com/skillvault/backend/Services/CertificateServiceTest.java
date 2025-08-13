@@ -40,7 +40,7 @@ class CertificateServiceTest {
     @Mock
     private TokenService tokenService;
 
-    @Autowired
+    @Autowired  
     private UserRepository userRepository;
 
     @Mock

@@ -56,6 +56,14 @@ public class CertificateController {
         return ResponseEntity.ok(dtoPage);
     }
 
+    @GetMapping("/by-user/featured/{userId}")
+    public ResponseEntity<Page<CertificateResponseDTO>> getFeaturedCertificatesByUserId(@PathVariable UUID userId, Pageable pageable){
+        Page<CertificateResponseDTO> dtoPage = certificateService.
+                getFeaturedCertificatesByUser(userId, pageable)
+                .map(CertificateResponseDTO::new);
+        return ResponseEntity.ok(dtoPage);
+    }
+
     @PostMapping
     public ResponseEntity<CertificateResponseDTO> uploadCertificate(@RequestBody CertificateRequestDTO data){
         CertificateResponseDTO certificate = certificateService.uploadCertificate(data);
